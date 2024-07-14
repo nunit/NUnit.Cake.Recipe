@@ -3,6 +3,7 @@ public class NuGetPackage : PackageDefinition
     public NuGetPackage(
         string id, 
         string source, 
+        string basePath = null,
         IPackageTestRunner testRunner = null,
         TestRunnerSource testRunnerSource = null,
         PackageCheck[] checks = null, 
@@ -12,6 +13,7 @@ public class NuGetPackage : PackageDefinition
         PackageType.NuGet, 
         id, 
         source, 
+        basePath: basePath,
         testRunner: testRunner, 
         testRunnerSource: testRunnerSource,
         checks: checks, 
@@ -44,7 +46,7 @@ public class NuGetPackage : PackageDefinition
         var nugetPackSettings = new NuGetPackSettings()
         {
             Version = PackageVersion,
-            BasePath = BuildSettings.OutputDirectory,
+            BasePath = BasePath,
             OutputDirectory = BuildSettings.PackageDirectory,
             NoPackageAnalysis = true,
             Symbols = HasSymbols

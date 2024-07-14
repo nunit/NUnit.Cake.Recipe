@@ -8,11 +8,10 @@ packages
 .vs
 
 # Packaging Directory
-packaging
+package
 
 # Tools pulled from nuget
 tools
-!tools/packages.config
 
 # Draft GitHub Release
 DraftRelease.md

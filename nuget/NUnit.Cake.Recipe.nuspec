@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>NUnit.Cake.Recipe</id>
+    <title>NUnit Cake Recipe</title>
+    <version>$version$</version>
+    <authors>Charlie Poole</authors>
+    <owners>Charlie Poole</owners>
+	  <summary>Cake Recipe used for building NUnit applications and extensions.</summary>
+	  <description>Cake Recipe used for building NUnit applications and extensions.</description>
+	  <license type="file">LICENSE.txt</license>
+    <projectUrl>https://nunit.org</projectUrl>
+    <repository type="git" url="https://github.com/nunit/NUnit.Cake.Recipe"/>
+    <iconUrl>https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png</iconUrl>
+    <icon>nunit_256.png</icon>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <releaseNotes>https://github.com/nunit/NUnit.Cake.Recipe/releases</releaseNotes>
+    <language>en-US</language>
+    <tags>nunit cake recipe</tags>
+    <copyright>Copyright (c) 2016-2024 Charlie Poole</copyright>
+  </metadata>
+</package>

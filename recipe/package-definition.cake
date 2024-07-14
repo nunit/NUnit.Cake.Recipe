@@ -23,6 +23,7 @@ public abstract class PackageDefinition
         PackageType packageType,
         string id,
         string source,
+        string basePath = null, // Defaults to OutputDirectory
         IPackageTestRunner testRunner = null,
         TestRunnerSource testRunnerSource = null,
         string extraTestArguments = null,
@@ -41,7 +42,7 @@ public abstract class PackageDefinition
         PackageId = id;
         PackageVersion = BuildSettings.PackageVersion;
         PackageSource = source;
-        BasePath = BuildSettings.OutputDirectory;
+        BasePath = basePath ?? BuildSettings.OutputDirectory;
         TestRunner = testRunner;
         TestRunnerSource = testRunnerSource;
         ExtraTestArguments = extraTestArguments;

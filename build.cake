@@ -17,13 +17,14 @@ BuildSettings.Initialize(
 //////////////////////////////////////////////////////////////////////
 
 BuildSettings.Packages.Add(
-	new NuGetPackage
+	new RecipePackage
 	(
 		id: "NUnit.Cake.Recipe",
-		source: "nuget/NUnit.Cake.Recipe.nuspec"
-		//description: "Cake Recipe used for building TestCentric applications and extensions",
-		//releaseNotes: new [] {"line1", "line2", "line3"},
-		//tags: new [] { "testcentric", "cake", "recipe" }
+		source: "nuget/NUnit.Cake.Recipe.nuspec",
+		checks: new PackageCheck[] {
+			HasFiles("README.md", "LICENSE.txt", "nunit_256.png"),
+			HasDirectory("content").WithFiles(BuildSettings.Context.GetFiles("recipe/*.cake").Select(f => f.GetFilename()).ToArray())
+		}
 	) );
 
 //////////////////////////////////////////////////////////////////////
