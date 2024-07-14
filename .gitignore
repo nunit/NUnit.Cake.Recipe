@@ -1,0 +1,18 @@
+# NuGet Packages Directory
+packages
+
+# VsCode
+.vscode
+
+# Visual Studio
+.vs
+
+# Packaging Directory
+packaging
+
+# Tools pulled from nuget
+tools
+!tools/packages.config
+
+# Draft GitHub Release
+DraftRelease.md
