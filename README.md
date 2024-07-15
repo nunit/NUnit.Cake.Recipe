@@ -76,9 +76,9 @@ to build and test, for use in debugging. Consists of one or
 more specifications, separated by '|' and '&'. Each specification
 is of the form "prop=value", where prop may be either id or type.
 Examples:
-    --where type=nuget
-    --where id=NUnit.Engine.Api
-    --where "type=nuget|type=choco"
+* --where type=nuget
+* --where id=NUnit.Engine.Api
+* --where "type=nuget|type=choco"
 
 #### --level=LEVEL                [--lev]
 Specifies the level of package testing, which is normally set
