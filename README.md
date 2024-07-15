@@ -1,23 +1,25 @@
 # NUnit.Cake.Recipe
 
-NUnit.Cake.Recipe is a standard cake recipe used for NUnit projects. It is inspired by Cake.Recipe but is somewhat simpler in implementation, since it isn't intended for general use. The recipe is still under development.
+NUnit.Cake.Recipe is a standard cake recipe used for NUnit projects. It is inspired by Cake.Recipe,
+but is somewhat simpler in implementation, since it isn't intended for general use.
 
 ## Structure of the `build.cake` File
 
-The following is an example of a simple `build.cake` file for a project which creates a single package.
+The following is an example of a simple `build.cake` file for a project which uses the recipe
+to create a single package.
 
 ```
 // Load the recipe
-#load nuget:?package=NUnit.Cake.Recipe&version=1.0.0
+#load nuget:?package=NUnit.Cake.Recipe&version=1.0.0 // Note 1
 
 // Initialize Build Settings
-BuildSettings.Initialize(
+BuildSettings.Initialize(                            // Note 2
 	context: Context,
 	title: "Sample Application",
 	githubRepository: "NUnit.Sample.Application");
 
 // Define the package
-BuildSettings.Packages.Add(new NuGetPackage(
+BuildSettings.Packages.Add(new NuGetPackage(         // Note 3
 	id: "NUnit.Sample.Application",
 	source: "nuget/NUnit.Sample.Application.nuspec",
 	checks: new PackageCheck[] {
@@ -26,17 +28,17 @@ BuildSettings.Packages.Add(new NuGetPackage(
 			"lib/net8.0/nunit.sample.application.dll") }));
 
 // Run the task selected by user or default task
-Build.Run();
+Build.Run();                                         // Note 4
 ```
 
 **NOTES:**
 
 1. The `#load` statement loads `NUnit.Cake.Recipe`, specifying the version to use, 
-   in this case version 1.1.0. It is generally recommended that you specify the recipe 
+   in this case version 1.0.0. It is recommended that you specify the recipe 
    version to avoid unpleasant surprises when the recipe is updated.
 
 2. `BuildSettings.Initialize` sets the parameters which drive the build process. The example
-   specifies only the three required paraameters. See below for a complete list of parameters.
+   specifies only the three required paraameters.
 
 3. Define a single `nuget` package.
 
@@ -44,12 +46,10 @@ Build.Run();
 
 ## Supported Arguments
 
-The recipe supports a number of standard arguments for use in any project
-that uses it. Additional arguments may be supported directly by the user's
-`build.cake` if necessary but must not conflict with the built-in arguments.
+The recipe supports a number of standard command-line arguments. Additional arguments may be
+supported directly by the user's `build.cake` file, but must not conflict with the built-in arguments.
 
-Arguments taking a value may use  `=` or space to separate the name
-from the value.
+Arguments taking a value may use  `=` or space to separate the name from the value.
 
 #### --target, -t=TARGET
 The name of the TARGET task to be run, e.g. Test. Default is "Build."
@@ -67,7 +67,19 @@ derived from the package version.
 
 NOTE: We can't use "version" since that's an argument to Cake itself.
 
-#### --testLevel, --level=LEVEL
+#### --where=EXPRESSION
+Specifies that packaging should be done for selected packages, rather
+than all of them. This is useful for debugging and testing projects
+which produce multiple packages.
+
+A simple expression is of the form `id=VALUE` or `type=VALUE`, where
+`id` specifies a package id and `type` specifies a package type:
+NuGet, Chocolatey or Zip. Both the key word and the value are case-inensitive.
+
+More complex expressions may be formed by use of & or |, with the usual
+precedence given to the operators. Use of parentheses is not supported.
+
+#### --level=LEVEL
 Specifies the level of package testing, which is normally set
 automatically for different types of builds like CI, PR, etc.
 Used by developers to test packages locally without creating
@@ -78,9 +90,7 @@ a PR or publishing the package. Defined levels are
 
 #### --trace=LEVEL
 Specifies the default trace level for this run. Values are Off,
-Error, Warning, Info or Debug. Default is value of environment
-variable NUnit_INTERNAL_TRACE_LEVEL if set. If not,
-tracing is turned Off.
+Error, Warning, Info or Debug. Default is Off.
 
 #### --nobuild
 Indicates that the Build task should not be run even if other
@@ -91,4 +101,4 @@ Indicates that no publishing or releasing should be done. If
 publish or release targets are run, a message is displayed.
 
 #### --usage
-Displays this help message. No targets are run.
+Displays a general help message. No targets are run.
