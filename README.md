@@ -49,16 +49,19 @@ Build.Run();                                         // Note 4
 The recipe supports a number of standard command-line arguments. Additional arguments may be
 supported directly by the user's `build.cake` file, but must not conflict with the built-in arguments.
 
-Arguments taking a value may use  `=` or space to separate the name from the value.
+Arguments taking a value may use  `=` or space to separate the name from the value and
+may be specified in abbreviated form, down to the minimum length shown in square braces.
+Single character abbreviations use a single dash.
 
-#### --target, -t=TARGET
-The name of the TARGET task to be run, e.g. Test. Default is "Build."
+#### --target=TARGET              [-t]
+The name of the TARGET task to be run, e.g. Test. Default is "Build." For a list
+of supported targets, use the Cake `--description` option.
 
-#### --configuration, -c=CONFIG
+#### --configuration=CONFIG       [-c]
 The name of the configuration to build, test and/or package, e.g. Debug.
 Defaults to Release.
 
-#### --packageVersion, --package=VERSION
+#### --packageVersion=VERSION     [--pack]
 Specifies the full package version, including any pre-release
 suffix. This version is used directly instead of the default
 version from the script or that calculated by GitVersion.
@@ -67,19 +70,17 @@ derived from the package version.
 
 NOTE: We can't use "version" since that's an argument to Cake itself.
 
-#### --where=EXPRESSION
-Specifies that packaging should be done for selected packages, rather
-than all of them. This is useful for debugging and testing projects
-which produce multiple packages.
+#### --where=SELECTION            [-w]
+Specifies a selction expression used to choose which packages
+to build and test, for use in debugging. Consists of one or
+more specifications, separated by '|' and '&'. Each specification
+is of the form "prop=value", where prop may be either id or type.
+Examples:
+    --where type=nuget
+    --where id=NUnit.Engine.Api
+    --where "type=nuget|type=choco"
 
-A simple expression is of the form `id=VALUE` or `type=VALUE`, where
-`id` specifies a package id and `type` specifies a package type:
-NuGet, Chocolatey or Zip. Both the key word and the value are case-inensitive.
-
-More complex expressions may be formed by use of & or |, with the usual
-precedence given to the operators. Use of parentheses is not supported.
-
-#### --level=LEVEL
+#### --level=LEVEL                [--lev]
 Specifies the level of package testing, which is normally set
 automatically for different types of builds like CI, PR, etc.
 Used by developers to test packages locally without creating
@@ -88,17 +89,17 @@ a PR or publishing the package. Defined levels are
   2. Adds more tests for PRs and Dev builds uploaded to MyGet
   3. Adds even more tests prior to publishing a release
 
-#### --trace=LEVEL
+#### --trace=LEVEL                [--tr]
 Specifies the default trace level for this run. Values are Off,
 Error, Warning, Info or Debug. Default is Off.
 
-#### --nobuild
+#### --nobuild                    [--nob]
 Indicates that the Build task should not be run even if other
 tasks depend on it. The existing build is used instead.
 
-#### --nopush
+#### --nopush                     [--nop]
 Indicates that no publishing or releasing should be done. If
 publish or release targets are run, a message is displayed.
 
-#### --usage
+#### --usage                 [--us]
 Displays a general help message. No targets are run.

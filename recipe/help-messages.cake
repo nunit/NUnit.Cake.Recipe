@@ -14,18 +14,19 @@
 
         Options:
 
-            --target=TARGET         [-t]
-                The TARGET task to be run, e.g. Test. Default is Build.
+            --target=TARGET              [-t]
+                The TARGET task to be run, e.g. Test. Default is Build. For a list
+                of supported targets, use the Cake `--description` option.
 
-            --configuration=CONFIG  [-c]
+            --configuration=CONFIG       [-c]
                 The name of the configuration to build. Default is Release.
 
-            --packageVersion        [--pack]
+            --packageVersion=VERSION     [--pack]
                 Specifies the full package version, including any pre-release
                 suffix. If provided, this version is used directly in place of
                 the default version calculated by the script.
 
-            --where=SELECTION       [-w]
+            --where=SELECTION            [-w]
                 Specifies a selction expression used to choose which packages
                 to build and test, for use in debugging. Consists of one or
                 more specifications, separated by '|' and '&'. Each specification
@@ -35,27 +36,25 @@
                     --where id=NUnit.Engine.Api
                     --where "type=nuget|type=choco"
 
-            --level=LEVEL           [--lev]
+            --level=LEVEL                [--lev]
                 Specifies the level of package testing, 1, 2 or 3. Defaults are
                   1 = for normal CI tests run every time you build a package
                   2 = for PRs and Dev builds uploaded to MyGet
                   3 = prior to publishing a release
 
-            --trace=LEVEL           [--tr]
+            --trace=LEVEL                [--tr]
                 Specifies the default trace level for this run. Values are Off,
-                Error, Warning, Info or Debug. Default is value of environment
-                variable NUNIT_INTERNAL_TRACE_LEVEL if set. If not,
-                tracing is turned Off.
+                Error, Warning, Info or Debug. Default is Off.
 
-            --nobuild               [--nob]
+            --nobuild                    [--nob]
                 Indicates that the Build task should not be run even if other
                 tasks depend on it. The existing build is used instead.
 
-            --nopush                [--nop]
+            --nopush                     [--nop]
                 Indicates that no publishing or releasing should be done. If
                 publish or release targets are run, a message is displayed.
 
-            --usage                 [--us]
+            --usage                      [--us]
                 Displays this help message. No targets are run.
 
         Selected Cake Options:
