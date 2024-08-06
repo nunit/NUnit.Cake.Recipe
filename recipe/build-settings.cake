@@ -17,9 +17,6 @@ public static class BuildSettings
         string[] validConfigurations = null,
         string githubOwner = "NUnit",
 
-		bool msbuildAllowPreviewVersion = false,
-		Verbosity msbuildVerbosity = Verbosity.Minimal,
-
         string unitTests = null, // Defaults to "**/*.tests.dll|**/*.tests.exe" (case insensitive)
         IUnitTestRunner unitTestRunner = null, // If not set, NUnitLite is used
         string unitTestArguments = null,
@@ -189,14 +186,21 @@ public static class BuildSettings
 
     // Building
 	public static string[] ValidConfigurations { get; set; }
-	public static bool MSBuildAllowPreviewVersion { get; set; }
-	public static Verbosity MSBuildVerbosity { get; set; }
-	public static MSBuildSettings MSBuildSettings => new MSBuildSettings {
-		Verbosity = MSBuildVerbosity,
-		Configuration = Configuration,
-		PlatformTarget = PlatformTarget.MSIL,
-		AllowPreviewVersion = MSBuildAllowPreviewVersion
-	};
+    public static DotNetBuildSettings DotNetBuildSettings => new DotNetBuildSettings
+    {
+        Configuration = Configuration,
+        NoRestore = true,
+        Verbosity = DotNetVerbosity.Minimal,
+        MSBuildSettings = new DotNetMSBuildSettings
+        {
+            BinaryLogger = new MSBuildBinaryLoggerSettings
+            {
+                Enabled = true,
+                FileName = "build-results/NUnitConsole.binlog",
+                Imports = MSBuildBinaryLoggerImports.Embed
+            }
+        }.WithProperty("Version", BuildSettings.PackageVersion)
+    };
 
 	// File Header Checks
 	public static bool SuppressHeaderCheck { get; private set; }
