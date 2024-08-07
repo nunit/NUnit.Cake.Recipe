@@ -151,7 +151,7 @@ public static class BuildSettings
 	public static bool IsRunningOnAppVeyor => _buildSystem.AppVeyor.IsRunningOnAppVeyor;
 
 	// Versioning
-    public static BuildVersion BuildVersion { get; private set;}
+    public static BuildVersion BuildVersion { get; private set; }
 	public static string BranchName => BuildVersion.BranchName;
 	public static bool IsReleaseBranch => BuildVersion.IsReleaseBranch;
 	public static string PackageVersion => BuildVersion.PackageVersion;
@@ -179,7 +179,7 @@ public static class BuildSettings
 	public static string ImageDirectory                 => ProjectDirectory + IMAGE_DIR;
     public static string ZipImageDirectory              => ProjectDirectory + ZIP_IMG_DIR;
 	public static string ExtensionsDirectory            => ProjectDirectory + "bundled-extensions/";
-	public static string ToolsDirectory                 => ProjectDirectory + "tools/";
+	public static string ToolsDirectory                 => ProjectDirectory + TOOLS_DIR;
 
     // Files
     public static string SolutionFile { get; set; }
