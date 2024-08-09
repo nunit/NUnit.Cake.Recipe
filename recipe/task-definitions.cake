@@ -133,3 +133,10 @@ BuildTasks.ContinuousIntegrationTask = Task("ContinuousIntegration")
 BuildTasks.AppveyorTask = Task("Appveyor")
 	.Description("Target for running on AppVeyor")
 	.IsDependentOn("ContinuousIntegration");
+
+BuildTasks.GitHubPublishActionTask = Task("GitHubPublishAction")
+	.Description("Target for running our GitHub Publish Action")
+	.IsDependentOn("Build")
+	.IsDependentOn("Test")
+	.IsDependentOn("Package")
+	.IsDependentOn("Publish");

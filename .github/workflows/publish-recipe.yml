@@ -1,11 +1,24 @@
-name: Publish Recipe
+﻿name: Publish Recipe
 
-on: workflow_dispatch
+on: [workflow_dispatch, push, pull_request]
 
 jobs:
   publish:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Publish Recipe
-      run: echo "This will publish the recipe to MyGet"
+    - name: ⤵️ Checkout Source
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: 🛠️ Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.100
+
+    - name: 🛠️ Install dotnet tools
+      run: dotnet tool restore
+
+    - name: 🔨 Publish Recipe
+      run: dotnet tool run dotnet-cake --target=GitHubPublishAction
