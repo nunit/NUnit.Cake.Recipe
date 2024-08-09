@@ -1,0 +1,11 @@
+name: Publish Recipe
+
+on: workflow_dispatch
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Publish Recipe
+      run: echo "This will publish the recipe to MyGet"
