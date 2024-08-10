@@ -22,7 +22,7 @@ jobs:
 
     - name: 🔨 Publish Recipe
       # TODO: 
-      # 1. Change target to Publish for publishing dev builds on MyGet.
+      # 1. Change target to Publish for publishing dev builds on MyGet. DONE
       # 2. Figure out process for creating the draft release.
       # 3. Change Target to ContinuousIntegration for full release.
-      run: dotnet tool run dotnet-cake --target=BuildTestAndPackage
+      run: dotnet cake --target=Publish
