@@ -44,5 +44,4 @@ public static class BuildTasks
 
 	// Continuous Integration
 	public static CakeTaskBuilder ContinuousIntegrationTask { get; set; }
-	public static CakeTaskBuilder AppveyorTask { get; set; }
 }
