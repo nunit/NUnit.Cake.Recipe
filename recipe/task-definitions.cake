@@ -129,7 +129,3 @@ BuildTasks.ContinuousIntegrationTask = Task("ContinuousIntegration")
 	.IsDependentOn("Publish")
 	.IsDependentOn("CreateDraftRelease")
 	.IsDependentOn("CreateProductionRelease");
-
-BuildTasks.AppveyorTask = Task("Appveyor")
-	.Description("Target for running on AppVeyor")
-	.IsDependentOn("ContinuousIntegration");
