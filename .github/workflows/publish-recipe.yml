@@ -21,6 +21,11 @@ jobs:
       run: dotnet tool restore
 
     - name: 🔨 Publish Recipe
+      env:
+        MYGET_API_KEY: ${{ secrets.PUBLISH_MYGET_ORG }}
+        NUGET_API_KEY: ${{ secrets.PUBLISH_NUGET_ORG }}
+        CHOCO_API_KEY: ${{ secrets.PUBLISH_CHOCOLATEY_ORG }}
+
       # TODO: 
       # 1. Change target to Publish for publishing dev builds on MyGet. DONE
       # 2. Figure out process for creating the draft release.
