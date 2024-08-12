@@ -3,7 +3,7 @@
 on: [workflow_dispatch, push, pull_request]
 
 jobs:
-  publish:
+  publish-recipe:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,6 +25,7 @@ jobs:
         MYGET_API_KEY: ${{ secrets.PUBLISH_MYGET_ORG }}
         NUGET_API_KEY: ${{ secrets.PUBLISH_NUGET_ORG }}
         CHOCO_API_KEY: ${{ secrets.PUBLISH_CHOCOLATEY_ORG }}
+        GITHUB_ACCESS_TOKEN: ${{ secrets.GH_ACCESS_CP }}
 
       # TODO: 
       # 1. Change target to Publish for publishing dev builds on MyGet. DONE
