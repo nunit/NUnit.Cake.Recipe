@@ -27,8 +27,4 @@ jobs:
         CHOCO_API_KEY: ${{ secrets.PUBLISH_CHOCOLATEY_ORG }}
         GITHUB_ACCESS_TOKEN: ${{ secrets.GH_ACCESS_CP }}
 
-      # TODO: 
-      # 1. Change target to Publish for publishing dev builds on MyGet. DONE
-      # 2. Figure out process for creating the draft release.
-      # 3. Change Target to ContinuousIntegration for full release.
-      run: dotnet cake --target=Publish
+      run: dotnet cake --target=ContinuousIntegration
