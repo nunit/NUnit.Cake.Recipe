@@ -10,6 +10,8 @@ public static class CommandLineOptions
     static private ICakeContext _context;
 
     static public ValueOption<string> Target;
+	static public MultiValueOption<string> Targets;
+
     static public ValueOption<string> Configuration;
     static public ValueOption<string> PackageVersion;
     static public ValueOption<string> PackageSelector; 
@@ -25,6 +27,9 @@ public static class CommandLineOptions
 
         // The name of the TARGET task to be run, e.g. Test.
         Target = new ValueOption<string>("target", "Default", 1);
+
+		// Multiple targets to be run
+		Targets = new MultiValueOption<string>("target", "Default", 1);
 
         Configuration = new ValueOption<String>("configuration", DEFAULT_CONFIGURATION, 1);
 		
@@ -114,5 +119,31 @@ public static class CommandLineOptions
 			    return DefaultValue;
 		    }
 	    }
+    }
+
+    // Generic MultiValueOption adds Values, which returns a collection of values
+    public class MultiValueOption<T> : ValueOption<T>
+    {
+	    public MultiValueOption(string name, T defaultValue, int minimumAbbreviation = 0, string description = null)
+		    : base(name, defaultValue, minimumAbbreviation, description) { }
+
+		public ICollection<T> Values
+		{
+			get
+			{
+				var result = new List<T>();
+
+			    for (int len = Name.Length; len >= MinimumAbbreviation; len--)
+			    {
+				    string abbrev = Name.Substring(0,len);
+				    if (_context.HasArgument(abbrev))
+					    result.AddRange(_context.Arguments<T>(abbrev));
+			    }
+
+				if (result.Count == 0) result.Add(DefaultValue);
+
+				return result;
+			}
+		}
     }
 }
