@@ -1,5 +1,5 @@
 # This copy of GitVersion.yml is used in building the recipe package itself.
-next-version: 1.1.0
+next-version: 1.2.0
 mode: ContinuousDelivery
 legacy-semver-padding: 5
 build-metadata-padding: 5
