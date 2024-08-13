@@ -100,8 +100,10 @@ public static class BuildSettings
 			return 3;
 
 		// TODO: The prerelease label is no longer being set to pr by GitVersion
-		// for some reason. This check in AppVeyor is a workaround.
+		// for some reason. This check is a workaround.
 		if (IsRunningOnAppVeyor && _buildSystem.AppVeyor.Environment.PullRequest.IsPullRequest)
+			return 2;
+		if (IsRunningOnGitHubActions && _buildSystem.GitHubActions.Environment.PullRequest.IsPullRequest)
 			return 2;
 		
 		switch (BuildVersion.PreReleaseLabel)
@@ -149,6 +151,7 @@ public static class BuildSettings
 	public static bool IsRunningOnUnix => Context.IsRunningOnUnix();
 	public static bool IsRunningOnWindows => Context.IsRunningOnWindows();
 	public static bool IsRunningOnAppVeyor => _buildSystem.AppVeyor.IsRunningOnAppVeyor;
+	public static bool IsRunningOnGitHubActions => _buildSystem.GitHubActions.IsRunningOnGitHubActions;
 
 	// Versioning
     public static BuildVersion BuildVersion { get; private set; }
@@ -279,6 +282,7 @@ public static class BuildSettings
 		Console.WriteLine("IsRunningOnWindows:           " + IsRunningOnWindows);
 		Console.WriteLine("IsRunningOnUnix:              " + IsRunningOnUnix);
 		Console.WriteLine("IsRunningOnAppVeyor:          " + IsRunningOnAppVeyor);
+		Console.WriteLine("IsRunningOnGitHubActions:     " + IsRunningOnGitHubActions);
 
 		Console.WriteLine("\nVERSIONING");
 		Console.WriteLine("PackageVersion:               " + PackageVersion);
