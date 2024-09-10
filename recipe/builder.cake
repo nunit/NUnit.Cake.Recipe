@@ -15,7 +15,7 @@ Task<CakeReport> RunTargetsAsync(ICollection<string> targets)
 private ICakeTaskInfo GetOrAddTargetsTask(ICollection<string> targets)
 {
     var targetsTaskName = string.Join('+', targets);
-    var targetsTask = Tasks.FirstOrDefault(task => task.Name == targetsTaskName);
+    var targetsTask = Tasks.FirstOrDefault(task => task.Name.Equals(targetsTaskName, StringComparison.OrdinalIgnoreCase));
 
     if (targetsTask == null)
     {
