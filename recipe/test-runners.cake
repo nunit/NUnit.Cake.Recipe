@@ -143,8 +143,17 @@ public class TestRunnerSource
 // For NUnitLite tests, the test is run directly
 public class NUnitLiteRunner : TestRunner, IUnitTestRunner
 {
-    public int RunUnitTest(FilePath testPath) =>
-        RunTest(testPath, BuildSettings.UnitTestArguments);
+    public int RunUnitTest(FilePath testPath)
+    {
+        var processSettings = new ProcessSettings { Arguments = BuildSettings.UnitTestArguments };
+        if (CommandLineOptions.TraceLevel.Exists)
+            processSettings.EnvironmentVariables = new Dictionary<string, string>
+            {
+                { "NUNIT_INTERNAL_TRACE_LEVEL", CommandLineOptions.TraceLevel.Value }
+            };
+
+        return RunTest(testPath, processSettings);
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////

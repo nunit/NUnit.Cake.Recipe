@@ -275,7 +275,7 @@ public abstract class PackageDefinition
             throw new Exception("One or more package tests had errors!");
     }
     
-    private void InstallExtensions(ExtensionSpecifier[] extensionsNeeded)
+    protected virtual void InstallExtensions(ExtensionSpecifier[] extensionsNeeded)
     {
         foreach (ExtensionSpecifier extension in extensionsNeeded)
             extension.InstallExtension(this);
