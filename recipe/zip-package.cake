@@ -22,6 +22,7 @@ public class ZipPackage : PackageDefinition
 
     // ZIP package supports bundling of extensions
     public PackageReference[] BundledExtensions { get; }
+    public bool HasBundledExtensions => BundledExtensions != null;
 
     // The file name of this package, including extension
     public override string PackageFileName => $"{PackageId}-{PackageVersion}.zip";
@@ -46,6 +47,12 @@ public class ZipPackage : PackageDefinition
         _context.Unzip($"{BuildSettings.PackageDirectory}{PackageFileName}", $"{PackageInstallDirectory}{PackageId}.{PackageVersion}");
     }
 
+    protected override void InstallExtensions(ExtensionSpecifier[] extensionsNeeded)
+    {
+        // TODO: Do nothing for now. Future: only install extensions not bundled
+        // or previously installed.
+    }
+
     private void CreateZipImage()
     {
         _context.CleanDirectory(BuildSettings.ZipImageDirectory);
@@ -57,10 +64,6 @@ public class ZipPackage : PackageDefinition
         _context.CopyDirectory(
             BuildSettings.OutputDirectory,
             BuildSettings.ZipImageDirectory + "bin/" );
-
-        _context.CopyFileToDirectory(
-            BuildSettings.ZipDirectory + "nunit.bundle.addins",
-            BuildSettings.ZipImageDirectory);
 
         var addinsDir = BuildSettings.ZipImageDirectory + "bin/net462/addins/";
         _context.CreateDirectory(addinsDir);
