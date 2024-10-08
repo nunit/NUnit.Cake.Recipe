@@ -1,15 +1,19 @@
 // Static class holding information about known extensions.
 public static class KnownExtensions
 {
-	// Static Variables representing well-known Extensions with the latest tested version
+	// Static Variables representing well-known Extensions with the latest tested version.
+	// Individual projects normally reference these without modification but may use
+	// .SetVersion() in order to specify a different version, e.g. when testing a new one.
 	public static ExtensionSpecifier NUnitV2Driver = new ExtensionSpecifier(
 		"NUnit.Extension.NUnitV2Driver", "nunit-extension-nunit-v2-driver", "3.9.0");
 	public static ExtensionSpecifier NUnitProjectLoader = new ExtensionSpecifier(
-		"NUnit.Extension.NUnitProjectLoader", "nunit-extension-nunit-project-loader", "3.7.1");
+		"NUnit.Extension.NUnitProjectLoader", "nunit-extension-nunit-project-loader", "3.8.0");
 	public static ExtensionSpecifier VSProjectLoader = new ExtensionSpecifier(
 		"NUnit.Extension.VSProjectLoader", "nunit-extension-vs-project-loader", "3.9.0");
 	public static ExtensionSpecifier NUnitV2ResultWriter = new ExtensionSpecifier(
-		"NUnit.Extension.NUnitV2ResultWriter", "nunit-extension-nunit-v2-result-writer", "3.7.0");
+		"NUnit.Extension.NUnitV2ResultWriter", "nunit-extension-nunit-v2-result-writer", "3.8.0");
+	public static ExtensionSpecifier TeamCityEventListener = new ExtensionSpecifier(
+		"NUnit.Extension.TeamCityEventListener", "nunit-extension-teamcity-event-listener", "1.0.7");
 }
 
 // Representation of an extension, for use by PackageTests. Because our
