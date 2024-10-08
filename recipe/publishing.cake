@@ -116,16 +116,17 @@ public static class PackageReleaseManager
 
 	private const string DRAFT_RELEASE_ERROR =
 		"A direct call to CreateDraftRelease is permitted only:\r\n" +
-		"  * On a release branch (release-x.x.x)\r\n" +
-		"  * On the main branch tagged for a production release\r\n" +
+		"  * On a release branch (release-x.x.x) OR\r\n" +
 		"  * Using option --packageVersion to specify a release version";
 
 	public static void CreateDraftRelease()
 	{
 		string releaseVersion =
-			CommandLineOptions.PackageVersion.Exists ? CommandLineOptions.PackageVersion.Value :
-			BuildSettings.IsReleaseBranch            ? BuildSettings.BuildVersion.BranchName.Substring(8) :
-			BuildSettings.IsProductionRelease        ? BuildSettings.PackageVersion : null;
+			CommandLineOptions.PackageVersion.Exists 
+				? CommandLineOptions.PackageVersion.Value
+				: BuildSettings.IsReleaseBranch 
+					? BuildSettings.BuildVersion.BranchName.Substring(8) 
+					: null;
 
 		if (releaseVersion != null)
 		{
