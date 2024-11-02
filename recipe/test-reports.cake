@@ -3,16 +3,14 @@ public class PackageTestReport
 	public PackageTest Test;
 	public ActualResult Result;
 	public ITestRunner Runner;
-	public List<string> Errors;
-	public List<string> Warnings;
+	public List<string> Errors = new List<string>();
+	public List<string> Warnings = new List<string>();
 
 	public PackageTestReport(PackageTest test, ActualResult actualResult, ITestRunner runner = null)
 	{
 		Test = test;
 		Result = actualResult;
 		Runner = runner;
-		Errors = new List<string>();
-		Warnings = new List<string>();
 
 		var expectedResult = test.ExpectedResult;
 
@@ -59,9 +57,9 @@ public class PackageTestReport
 	{
 		Test = test;
 		Result = null;
-		Errors = new List<string>();
+        Runner = runner;
+        
 		Errors.Add($"     {ex.Message}");
-		Runner = runner;
 	}
 
 	public void Display(int index, TextWriter writer)
