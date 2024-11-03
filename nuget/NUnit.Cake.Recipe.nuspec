@@ -6,9 +6,10 @@
     <version>$version$</version>
     <authors>Charlie Poole</authors>
     <owners>Charlie Poole</owners>
-	  <summary>Cake Recipe used for building NUnit applications and extensions.</summary>
-	  <description>Cake Recipe used for building NUnit applications and extensions.</description>
-	  <license type="file">LICENSE.txt</license>
+    <summary>Cake Recipe used for building NUnit applications and extensions.</summary>
+    <description>Cake Recipe used for building NUnit applications and extensions.</description>
+    <readme>README.md</readme>
+    <license type="file">LICENSE.txt</license>
     <projectUrl>https://nunit.org</projectUrl>
     <repository type="git" url="https://github.com/nunit/NUnit.Cake.Recipe"/>
     <iconUrl>https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png</iconUrl>
