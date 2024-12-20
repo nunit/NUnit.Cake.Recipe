@@ -72,8 +72,11 @@ BuildTasks.BuildTask = Task("Build")
 	.IsDependentOn("CheckHeaders")
 	.Description("Build the solution")
 	.Does(() =>	{
-		DotNetBuild(BuildSettings.SolutionFile, BuildSettings.DotNetBuildSettings);
-	});
+		if (BuildSettings.BuildWithMSBuild)
+            MSBuild(BuildSettings.SolutionFile, BuildSettings.MSBuildSettings);
+		else
+			DotNetBuild(BuildSettings.SolutionFile, BuildSettings.DotNetBuildSettings);
+    });
 
 BuildTasks.UnitTestTask = Task("Test")
 	.Description("Run unit tests")
