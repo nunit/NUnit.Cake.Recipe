@@ -164,7 +164,7 @@ public class NUnitLiteRunner : TestRunner, IUnitTestRunner
 // in the tools directory by use of a #tools directive.
 public class NUnitConsoleRunner : InstallableTestRunner, IUnitTestRunner, IPackageTestRunner
 {
-	protected override FilePath ExecutableRelativePath => "tools/nunit3-console.exe";
+	protected override FilePath ExecutableRelativePath => "tools/nunit4-console.exe";
 	
 	public NUnitConsoleRunner(string version) : base("NUnit.ConsoleRunner", version) { }
 
@@ -177,7 +177,7 @@ public class NUnitConsoleRunner : InstallableTestRunner, IUnitTestRunner, IPacka
 
 public class NUnitNetCoreConsoleRunner : InstallableTestRunner, IUnitTestRunner, IPackageTestRunner
 {
-	protected override FilePath ExecutableRelativePath => "tools/net6.0/nunit3-console.exe";
+	protected override FilePath ExecutableRelativePath => "tools/net6.0/nunit4-console.exe";
 
 	public NUnitNetCoreConsoleRunner(string version) : base("NUnit.ConsoleRunner.NetCore", version) { }
 
