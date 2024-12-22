@@ -71,7 +71,52 @@ public static class PackageReleaseManager
 			}
 	}
 
-	public static void PublishToChocolatey()
+	/// <summary>
+	/// Re-publish a symbol package after a failure. Must specify --where
+	/// if more than one NuGet package exists in the current project.
+	/// </summary>
+	public static void PublishSymbolsPackage()
+	{
+		if (!BuildSettings.ShouldPublishToNuGet)
+			_context.Information("Nothing to publish to NuGet from this run.");
+		else if (CommandLineOptions.NoPush)
+			_context.Information("NoPush option suppressing publication to NuGet");
+		else
+		{
+			var package = GetSingleNuGetPackage();
+			var packageName = $"{package.PackageId}.{BuildSettings.PackageVersion}.snupkg";
+			var packagePath = BuildSettings.PackageDirectory + packageName;
+			_context.NuGetPush(packagePath, new NuGetPushSettings() { ApiKey = BuildSettings.NuGetApiKey, Source = BuildSettings.NuGetPushUrl });
+		}
+	}
+
+	private static PackageDefinition GetSingleNuGetPackage()
+	{
+        var nugetPackages = BuildSettings.Packages.Where(p => p.PackageType == PackageType.NuGet);
+		foreach (var nugetPackage in nugetPackages)
+			_context.Information(nugetPackage.PackageId);
+		bool selectorExists = CommandLineOptions.PackageSelector.Exists;
+		PackageDefinition selectedPackage = null;
+		int selectionCount = 0;
+
+		foreach (var package in nugetPackages)
+			if (!selectorExists || package.IsSelectedBy(CommandLineOptions.PackageSelector.Value))
+			{
+				selectedPackage = package;
+				selectionCount++;
+			}
+
+		if (selectionCount == 0)
+			throw new Exception("No NuGet packages were selected!");
+		else if (selectionCount == 1)
+			return selectedPackage;
+		else // count is > 1
+			throw new Exception(selectorExists
+				? "Multiple NuGet packages were selected. You must select a single package."
+				: "Multiple NuGet packages found. Select only one using the --where option.");
+    }
+
+    public static void PublishToChocolatey()
 	{
 		if (!BuildSettings.ShouldPublishToChocolatey)
 			_context.Information("Nothing to publish to Chocolatey from this run.");

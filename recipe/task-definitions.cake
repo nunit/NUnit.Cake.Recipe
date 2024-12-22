@@ -116,6 +116,10 @@ BuildTasks.PublishToChocolateyTask = Task("PublishToChocolatey")
     .Description("Publish packages to Chocolatey")
     .Does(() => PackageReleaseManager.PublishToChocolatey() );
 
+BuildTasks.PublishSymbolsPackageTask = Task("PublishSymbolsPackage")
+	.Description("\"Re-publish a specific symbols package to NuGet after a failure\"")
+	.Does(() => PackageReleaseManager.PublishSymbolsPackage());
+
 BuildTasks.CreateDraftReleaseTask = Task("CreateDraftRelease")
 	.Description("Create a draft release on GitHub")
 	.Does(() => PackageReleaseManager.CreateDraftRelease() );

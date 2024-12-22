@@ -35,6 +35,7 @@ public static class BuildTasks
 	public static CakeTaskBuilder PublishToMyGetTask { get; set; }
 	public static CakeTaskBuilder PublishToNuGetTask { get; set; }
 	public static CakeTaskBuilder PublishToChocolateyTask { get; set; }
+	public static CakeTaskBuilder PublishSymbolsPackageTask { get; set; }
 
 	// Releasing
 	public static CakeTaskBuilder CreateDraftReleaseTask { get; set; }
