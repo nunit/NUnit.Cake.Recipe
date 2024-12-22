@@ -21,7 +21,7 @@ public static class Check
 private static FileCheck HasFile(FilePath file) => HasFiles(new[] { file });
 private static FileCheck HasFiles(params FilePath[] files) => new FileCheck(files);
 
-private static DirectoryCheck HasDirectory(string dir) => new DirectoryCheck(dir);
+private static DirectoryCheck HasDirectory(string dirPathOrPattern) => new DirectoryCheck(dirPathOrPattern);
 
 //////////////////////////////////////////////////////////////////////
 // PACKAGECHECK CLASS
@@ -106,12 +106,12 @@ public class FileCheck : PackageCheck
 
 public class DirectoryCheck : PackageCheck
 {
-	private DirectoryPath _relDirPath;
+	private string _dirPathOrPattern;
 	private List<FilePath> _files = new List<FilePath>();
 
-	public DirectoryCheck(DirectoryPath relDirPath)
+	public DirectoryCheck(string dirPathOrPattern)
 	{
-		_relDirPath = relDirPath;
+		_dirPathOrPattern = dirPathOrPattern;
 	}
 
 	public DirectoryCheck WithFiles(params FilePath[] files)
@@ -138,11 +138,24 @@ public class DirectoryCheck : PackageCheck
 
 	public override bool ApplyTo(DirectoryPath testDirPath)
 	{
-		DirectoryPath absDirPath = testDirPath.Combine(_relDirPath);
+        if (_dirPathOrPattern.Contains('*') || _dirPathOrPattern.Contains('?')) // Wildcard
+        {
+            var absDirPattern = testDirPath.Combine(_dirPathOrPattern).ToString();
+            foreach (var dir in _context.GetDirectories(absDirPattern))
+            {
+                // Use first one found
+                return CheckFilesExist(_files.Select(file => dir.CombineWithFilePath(file)));
+            }
+        }
+        else // No wildcard
+        {
+            var absDirPath = testDirPath.Combine(_dirPathOrPattern);
+            if (!CheckDirectoryExists(absDirPath))
+                return false;
 
-		if (!CheckDirectoryExists(absDirPath))
-			return false;
+            return CheckFilesExist(_files.Select(file => absDirPath.CombineWithFilePath(file)));
+        }
 
-		return CheckFilesExist(_files.Select(file => absDirPath.CombineWithFilePath(file)));
+		return false;
 	}
 }
