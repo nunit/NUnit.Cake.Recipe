@@ -86,13 +86,11 @@ public class BuildVersion
         if (label == branchName)
             label = "ci";
 
-        string suffix = "-" + label + _gitVersion.CommitsSinceVersionSourcePadded;
-
         switch (label)
         {
             case "ci":
                 branchName = Regex.Replace(branchName, "[^0-9A-Za-z-]+", "-");
-                suffix += "-" + branchName;
+                string suffix = $"-ci{_gitVersion.CommitsSinceVersionSourcePadded}-{branchName}";
                 // Nuget limits "special version part" to 20 chars. Add one for the hyphen.
                 if (suffix.Length > 21)
                     suffix = suffix.Substring(0, 21);
@@ -100,16 +98,12 @@ public class BuildVersion
 
             case "dev":
             case "pre":
-                return _gitVersion.MajorMinorPatch + suffix;
-
             case "pr":
-                return _gitVersion.LegacySemVerPadded;
-
             case "rc":
             case "alpha":
             case "beta":
             default:
-                return _gitVersion.LegacySemVer;
+                return _gitVersion.SemVer;
         }
     }
 }

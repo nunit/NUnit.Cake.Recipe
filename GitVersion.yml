@@ -7,7 +7,7 @@ commits-since-version-source-padding: 5
 branches:
   master:
     regex: ^main$
-    tag: dev
+    tag: alpha
   release:
     tag: pre
   pull-request:
