@@ -15,7 +15,12 @@ public static class BuildSettings
 
 		string solutionFile = null,
 		bool buildWithMSBuild = false,
+		
+		DotNetVerbosity dotnetVerbosity = DotNetVerbosity.Minimal,
 		Verbosity msbuildVerbosity = Verbosity.Minimal,
+        NuGetVerbosity nugetVerbosity = NuGetVerbosity.Normal,
+		bool chocolateyVerbosity = false,
+
 		string[] validConfigurations = null,
 		string githubOwner = "NUnit",
 
@@ -42,9 +47,13 @@ public static class BuildSettings
 
 		SolutionFile = solutionFile ?? DeduceSolutionFile();
 		BuildWithMSBuild = buildWithMSBuild;
-		MSBuildVerbosity = msbuildVerbosity;
 
-		ValidConfigurations = validConfigurations ?? DEFAULT_VALID_CONFIGS;
+		dotnetVerbosity = dotnetVerbosity;
+		MSBuildVerbosity = msbuildVerbosity;
+		NuGetVerbosity = nugetVerbosity;
+		ChocolateyVerbosity = chocolateyVerbosity;
+
+        ValidConfigurations = validConfigurations ?? DEFAULT_VALID_CONFIGS;
 
 		UnitTests = unitTests;
 		// NUnitLiteRunner depends indirectly on ValidConfigurations
@@ -194,8 +203,14 @@ public static class BuildSettings
 	// Building
 	public static string[] ValidConfigurations { get; set; }
 
-	public static bool BuildWithMSBuild { get; set; }
+	public static DotNetVerbosity DotNetVerbosity { get; set; }
 	public static Verbosity MSBuildVerbosity { get; set; }
+    public static NuGetVerbosity NuGetVerbosity { get; set; }
+	// The chocolatey Setting is actually bool Verbose, but we use verbosity 
+    // so it lines up with the settings for NuGet
+    public static bool ChocolateyVerbosity { get; set; }
+
+    public static bool BuildWithMSBuild { get; set; }
 	public static MSBuildSettings MSBuildSettings => new MSBuildSettings
 	{
 		Verbosity = MSBuildVerbosity,
@@ -206,7 +221,7 @@ public static class BuildSettings
     {
         Configuration = Configuration,
         NoRestore = true,
-        Verbosity = DotNetVerbosity.Minimal,
+        Verbosity = DotNetVerbosity,
         MSBuildSettings = new DotNetMSBuildSettings
         {
             BinaryLogger = new MSBuildBinaryLoggerSettings
