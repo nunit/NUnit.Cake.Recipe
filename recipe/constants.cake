@@ -47,7 +47,7 @@ private const string CHOCO_API_KEY = "CHOCO_API_KEY";
 private const string GITHUB_ACCESS_TOKEN = "GITHUB_ACCESS_TOKEN";
 
 // Pre-release labels that we publish
-private static readonly string[] LABELS_WE_PUBLISH_ON_MYGET = { "dev" };
-private static readonly string[] LABELS_WE_PUBLISH_ON_NUGET = { "alpha", "beta", "rc" };
-private static readonly string[] LABELS_WE_PUBLISH_ON_CHOCOLATEY = { "alpha", "beta", "rc" };
-private static readonly string[] LABELS_WE_RELEASE_ON_GITHUB = { "alpha", "beta", "rc" };
+private static readonly string[] LABELS_WE_PUBLISH_ON_MYGET = { "dev", "alpha" };
+private static readonly string[] LABELS_WE_PUBLISH_ON_NUGET = { "beta", "rc" };
+private static readonly string[] LABELS_WE_PUBLISH_ON_CHOCOLATEY = { "beta", "rc" };
+private static readonly string[] LABELS_WE_RELEASE_ON_GITHUB = { "beta", "rc" };
