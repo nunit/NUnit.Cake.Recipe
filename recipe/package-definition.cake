@@ -170,7 +170,8 @@ public abstract class PackageDefinition
             OutputDirectory = PackageInstallDirectory,
             //ExcludeVersion = true,
 		    Prerelease = true,
-		    NoCache = true
+		    NoCache = true,
+            Verbosity = BuildSettings.NuGetVerbosity
 	    };
 
         _context.NuGetInstall(PackageId, installSettings);

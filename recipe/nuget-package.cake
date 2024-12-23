@@ -49,7 +49,8 @@ public class NuGetPackage : PackageDefinition
             BasePath = BasePath,
             OutputDirectory = BuildSettings.PackageDirectory,
             NoPackageAnalysis = true,
-            Symbols = HasSymbols
+            Symbols = HasSymbols,
+            Verbosity = BuildSettings.NuGetVerbosity
         };
 
         if (HasSymbols)
