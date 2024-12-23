@@ -30,6 +30,7 @@ public static class PackageReleaseManager
 		else
 			foreach (var package in BuildSettings.Packages)
 			{
+				// Change
 				var packageName = $"{package.PackageId}.{BuildSettings.PackageVersion}.nupkg";
 				var packagePath = BuildSettings.PackageDirectory + packageName;
 				try
