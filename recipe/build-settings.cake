@@ -15,10 +15,10 @@ public static class BuildSettings
 
 		string solutionFile = null,
 		bool buildWithMSBuild = false,
-		
+
 		DotNetVerbosity dotnetVerbosity = DotNetVerbosity.Minimal,
 		Verbosity msbuildVerbosity = Verbosity.Minimal,
-        NuGetVerbosity nugetVerbosity = NuGetVerbosity.Normal,
+		NuGetVerbosity nugetVerbosity = NuGetVerbosity.Normal,
 		bool chocolateyVerbosity = false,
 
 		string[] validConfigurations = null,
@@ -48,12 +48,12 @@ public static class BuildSettings
 		SolutionFile = solutionFile ?? DeduceSolutionFile();
 		BuildWithMSBuild = buildWithMSBuild;
 
-		dotnetVerbosity = dotnetVerbosity;
+		DotNetVerbosity = dotnetVerbosity;
 		MSBuildVerbosity = msbuildVerbosity;
 		NuGetVerbosity = nugetVerbosity;
 		ChocolateyVerbosity = chocolateyVerbosity;
 
-        ValidConfigurations = validConfigurations ?? DEFAULT_VALID_CONFIGS;
+		ValidConfigurations = validConfigurations ?? DEFAULT_VALID_CONFIGS;
 
 		UnitTests = unitTests;
 		// NUnitLiteRunner depends indirectly on ValidConfigurations
@@ -178,60 +178,60 @@ public static class BuildSettings
 
 	// Standard Directory Structure - not changeable by user
 	public static string ProjectDirectory => Context.Environment.WorkingDirectory.FullPath + "/";
-    public static string SourceDirectory                => ProjectDirectory + SRC_DIR;
-    public static string OutputDirectory                => ProjectDirectory + BIN_DIR + Configuration + "/";
-    public static string NuGetDirectory                 => ProjectDirectory + NUGET_DIR;
-    public static string ChocolateyDirectory            => ProjectDirectory + CHOCO_DIR;
-    public static string ZipDirectory                   => ProjectDirectory + ZIP_DIR;
-    public static string PackageDirectory               => ProjectDirectory + PACKAGE_DIR;
-    public static string PackageTestDirectory           => ProjectDirectory + PKG_TEST_DIR;
-    public static string NuGetTestDirectory             => ProjectDirectory + NUGET_TEST_DIR;
-    public static string ChocolateyTestDirectory        => ProjectDirectory + CHOCO_TEST_DIR;
-    public static string ZipTestDirectory               => ProjectDirectory + ZIP_TEST_DIR;
-    public static string PackageResultDirectory         => ProjectDirectory + PKG_RSLT_DIR;
-    public static string NuGetResultDirectory           => ProjectDirectory + NUGET_RSLT_DIR;
-    public static string ChocolateyResultDirectory      => ProjectDirectory + CHOCO_RSLT_DIR;
-    public static string ZipResultDirectory             => ProjectDirectory + ZIP_RSLT_DIR;
-    public static string ImageDirectory                 => ProjectDirectory + IMAGE_DIR;
-    public static string ZipImageDirectory              => ProjectDirectory + ZIP_IMG_DIR;
-    public static string ExtensionsDirectory            => ProjectDirectory + "bundled-extensions/";
-    public static string ToolsDirectory                 => ProjectDirectory + TOOLS_DIR;
+	public static string SourceDirectory => ProjectDirectory + SRC_DIR;
+	public static string OutputDirectory => ProjectDirectory + BIN_DIR + Configuration + "/";
+	public static string NuGetDirectory => ProjectDirectory + NUGET_DIR;
+	public static string ChocolateyDirectory => ProjectDirectory + CHOCO_DIR;
+	public static string ZipDirectory => ProjectDirectory + ZIP_DIR;
+	public static string PackageDirectory => ProjectDirectory + PACKAGE_DIR;
+	public static string PackageTestDirectory => ProjectDirectory + PKG_TEST_DIR;
+	public static string NuGetTestDirectory => ProjectDirectory + NUGET_TEST_DIR;
+	public static string ChocolateyTestDirectory => ProjectDirectory + CHOCO_TEST_DIR;
+	public static string ZipTestDirectory => ProjectDirectory + ZIP_TEST_DIR;
+	public static string PackageResultDirectory => ProjectDirectory + PKG_RSLT_DIR;
+	public static string NuGetResultDirectory => ProjectDirectory + NUGET_RSLT_DIR;
+	public static string ChocolateyResultDirectory => ProjectDirectory + CHOCO_RSLT_DIR;
+	public static string ZipResultDirectory => ProjectDirectory + ZIP_RSLT_DIR;
+	public static string ImageDirectory => ProjectDirectory + IMAGE_DIR;
+	public static string ZipImageDirectory => ProjectDirectory + ZIP_IMG_DIR;
+	public static string ExtensionsDirectory => ProjectDirectory + "bundled-extensions/";
+	public static string ToolsDirectory => ProjectDirectory + TOOLS_DIR;
 
-    // Files
-    public static string SolutionFile { get; set; }
+	// Files
+	public static string SolutionFile { get; set; }
 
 	// Building
 	public static string[] ValidConfigurations { get; set; }
 
 	public static DotNetVerbosity DotNetVerbosity { get; set; }
 	public static Verbosity MSBuildVerbosity { get; set; }
-    public static NuGetVerbosity NuGetVerbosity { get; set; }
+	public static NuGetVerbosity NuGetVerbosity { get; set; }
 	// The chocolatey Setting is actually bool Verbose, but we use verbosity 
-    // so it lines up with the settings for NuGet
-    public static bool ChocolateyVerbosity { get; set; }
+	// so it lines up with the settings for NuGet
+	public static bool ChocolateyVerbosity { get; set; }
 
-    public static bool BuildWithMSBuild { get; set; }
+	public static bool BuildWithMSBuild { get; set; }
 	public static MSBuildSettings MSBuildSettings => new MSBuildSettings
 	{
 		Verbosity = MSBuildVerbosity,
 		Configuration = Configuration,
 		PlatformTarget = PlatformTarget.MSIL
 	};
-    public static DotNetBuildSettings DotNetBuildSettings => new DotNetBuildSettings
-    {
-        Configuration = Configuration,
-        NoRestore = true,
-        Verbosity = DotNetVerbosity,
-        MSBuildSettings = new DotNetMSBuildSettings
-        {
-            BinaryLogger = new MSBuildBinaryLoggerSettings
-            {
-                Enabled = true,
-                FileName = "build-results/NUnitConsole.binlog",
-                Imports = MSBuildBinaryLoggerImports.Embed
-            }
-        }.WithProperty("Version", BuildSettings.PackageVersion)
-    };
+	public static DotNetBuildSettings DotNetBuildSettings => new DotNetBuildSettings
+	{
+		Configuration = Configuration,
+		NoRestore = true,
+		Verbosity = DotNetVerbosity,
+		MSBuildSettings = new DotNetMSBuildSettings
+		{
+			BinaryLogger = new MSBuildBinaryLoggerSettings
+			{
+				Enabled = true,
+				FileName = "build-results/NUnitConsole.binlog",
+				Imports = MSBuildBinaryLoggerImports.Embed
+			}
+		}.WithProperty("Version", BuildSettings.PackageVersion)
+	};
 
 	// File Header Checks
 	public static bool SuppressHeaderCheck { get; private set; }
@@ -245,7 +245,8 @@ public static class BuildSettings
 
 	// Packaging
 	public static string Title { get; private set; }
-    public static List<PackageDefinition> Packages { get; } = new List<PackageDefinition>();
+	public static List<PackageDefinition> Packages { get; } = new List<PackageDefinition>();
+	public static List<PackageDefinition> SelectedPackages { get; } = new List<PackageDefinition>();
 
 	// Package Testing
 	public static int PackageTestLevel =>
@@ -270,15 +271,18 @@ public static class BuildSettings
 	public static string GitHubRepository { get; set; }
 	public static string GitHubAccessToken => Context.EnvironmentVariable(GITHUB_ACCESS_TOKEN);
 
+	// Publishing - Policies
 	public static bool IsPreRelease => BuildVersion.IsPreRelease;
+	public static bool ShouldPublishRelease =>
+		!IsPreRelease || LABELS_WE_PUBLISH.Contains(BuildVersion.PreReleaseLabel);
 	public static bool ShouldPublishToMyGet =>
 		!IsPreRelease || LABELS_WE_PUBLISH_ON_MYGET.Contains(BuildVersion.PreReleaseLabel);
 	public static bool ShouldPublishToNuGet =>
 		!IsPreRelease || LABELS_WE_PUBLISH_ON_NUGET.Contains(BuildVersion.PreReleaseLabel);
 	public static bool ShouldPublishToChocolatey =>
 		!IsPreRelease || LABELS_WE_PUBLISH_ON_CHOCOLATEY.Contains(BuildVersion.PreReleaseLabel);
-	public static bool IsProductionRelease =>
-		!IsPreRelease || LABELS_WE_RELEASE_ON_GITHUB.Contains(BuildVersion.PreReleaseLabel);
+	public static bool ShouldPublishToGitHub =>
+		!IsPreRelease || LABELS_WE_PUBLISH_ON_GITHUB.Contains(BuildVersion.PreReleaseLabel);
 
 	private static void ValidateSettings()
 	{
@@ -361,20 +365,25 @@ public static class BuildSettings
 		foreach (var package in Packages)
 		{
 			Console.WriteLine(package.PackageId);
-			Console.WriteLine("  PackageType:               " + package.PackageType);
-			Console.WriteLine("  PackageFileName:           " + package.PackageFileName);
-			Console.WriteLine("  PackageInstallDirectory:   " + package.PackageInstallDirectory);
-            Console.WriteLine("  PackageTestDirectory:      " + package.PackageTestDirectory);
+			Console.WriteLine("  PackageType:             " + package.PackageType);
+			Console.WriteLine("  PackageFileName:         " + package.PackageFileName);
+			Console.WriteLine("  PackageInstallDirectory: " + package.PackageInstallDirectory);
+            Console.WriteLine("  PackageTestDirectory:    " + package.PackageTestDirectory);
 		}
+		var selected = SelectedPackages.Select(p => p.PackageId);
+		if (CommandLineOptions.PackageSelector.Exists)
+			Console.WriteLine("  SelectedPackages:        " + string.Join(", ", selected.ToArray()));
+		else
+			Console.WriteLine("  SelectedPackages:        NO SELECTOR SPECIFIED");
 
-		Console.WriteLine("\nPUBLISHING");
+        Console.WriteLine("\nPUBLISHING");
 		Console.WriteLine("ShouldPublishToMyGet:      " + ShouldPublishToMyGet);
 		Console.WriteLine("ShouldPublishToNuGet:      " + ShouldPublishToNuGet);
 		Console.WriteLine("ShouldPublishToChocolatey: " + ShouldPublishToChocolatey);
 
 		Console.WriteLine("\nRELEASING");
-		Console.WriteLine("BranchName:                   " + BranchName);
-		Console.WriteLine("IsReleaseBranch:              " + IsReleaseBranch);
-		Console.WriteLine("IsProductionRelease:          " + IsProductionRelease);
+		Console.WriteLine("BranchName:                " + BranchName);
+		Console.WriteLine("IsReleaseBranch:           " + IsReleaseBranch);
+		Console.WriteLine("ShouldPublishToGitHub:     " + ShouldPublishToGitHub);
 	}
 }
