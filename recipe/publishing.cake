@@ -42,18 +42,18 @@ public static class PackageReleaseManager
             {
                 ApplyReleaseTagToBuild(BuildSettings.PackageVersion);
 
-                if (publishToMyGet)
+				if (publishToMyGet)
 					if (packageType == PackageType.NuGet)
 						PushNuGetPackage(packagePath, BuildSettings.MyGetApiKey, BuildSettings.MyGetPushUrl);
 					else
-                        PushChocolateyPackage(packagePath, BuildSettings.MyGetApiKey, BuildSettings.MyGetPushUrl);
+						PushChocolateyPackage(packagePath, BuildSettings.MyGetApiKey, BuildSettings.MyGetPushUrl);
 
-                if (publishToNuGet)
-                    PushNuGetPackage(packagePath, BuildSettings.NuGetApiKey, BuildSettings.NuGetPushUrl);
+				if (publishToNuGet)
+					PushNuGetPackage(packagePath, BuildSettings.NuGetApiKey, BuildSettings.NuGetPushUrl);
 
-                if (publishToChocolatey)
-                    PushChocolateyPackage(packagePath, BuildSettings.ChocolateyApiKey, BuildSettings.ChocolateyPushUrl);
-            }
+				if (publishToChocolatey)
+					PushChocolateyPackage(packagePath, BuildSettings.ChocolateyApiKey, BuildSettings.ChocolateyPushUrl);
+			}
             catch (Exception ex)
             {
                 _context.Error(ex.Message);
@@ -79,9 +79,7 @@ public static class PackageReleaseManager
 		try
 		{
 			_context.GitTag(BuildSettings.ProjectDirectory, releaseTag);
-            _context.GitPushRef(BuildSettings.ProjectDirectory, BuildSettings.GitHubOwner, BuildSettings.GitHubAccessToken, "origin", releaseTag);
-
-            _context.Information($"  Release tagged as {releaseTag} and pushed to origin.");
+            _context.Information($"  Release tagged as {releaseTag}.");
         }
         catch (Exception ex)
 		{
