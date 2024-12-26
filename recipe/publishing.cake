@@ -79,9 +79,13 @@ public static class PackageReleaseManager
 		try
 		{
             _context.GitTag(BuildSettings.ProjectDirectory, releaseTag);
-            _context.GitPushRef(BuildSettings.ProjectDirectory, BuildSettings.GitHubOwner, BuildSettings.GitHubAccessToken, "origin", releaseTag);
+            _context.Information($"  Release tagged as {releaseTag}.");
 
-            _context.Information($"  Release tagged as {releaseTag} and pushed to origin.");
+			if (releaseTag.Contains("-alpha."))
+			{
+				_context.GitPushRef(BuildSettings.ProjectDirectory, BuildSettings.GitHubOwner, BuildSettings.GitHubAccessToken, "origin", releaseTag);
+				_context.Information($"  Release tag {releaseTag} was pushed to origin.");
+			}
         }
         catch (Exception ex)
 		{
