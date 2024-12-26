@@ -102,19 +102,12 @@ BuildTasks.BuildTestAndPackageTask = Task("BuildTestAndPackage")
 BuildTasks.PublishTask = Task("Publish")
 	.Description("Publish all packages for current branch")
 	.IsDependentOn("Package")
-	.Does(() => PackageReleaseManager.Publish());
-
-BuildTasks.PublishToMyGetTask = Task("PublishToMyGet")
-    .Description("Publish packages to MyGet")
-    .Does(() => PackageReleaseManager.PublishToMyGet() );
-
-BuildTasks.PublishToNuGetTask = Task("PublishToNuGet")
-    .Description("Publish packages to NuGet")
-    .Does(() => PackageReleaseManager.PublishToNuGet() );
-
-BuildTasks.PublishToChocolateyTask = Task("PublishToChocolatey")
-    .Description("Publish packages to Chocolatey")
-    .Does(() => PackageReleaseManager.PublishToChocolatey() );
+	.Does(() => {
+		if (BuildSettings.ShouldPublishRelease)
+			PackageReleaseManager.Publish();
+		else
+            Information("Nothing to publish from this run.");
+    });
 
 BuildTasks.PublishSymbolsPackageTask = Task("PublishSymbolsPackage")
 	.Description("\"Re-publish a specific symbols package to NuGet after a failure\"")

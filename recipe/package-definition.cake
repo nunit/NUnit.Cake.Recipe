@@ -99,7 +99,8 @@ public abstract class PackageDefinition
                 if (index <= 0)
                     throw new ArgumentException("Selection expression does not contain =", "where");
                 string prop = factor.Substring(0, index).Trim();
-                string val = factor.Substring(index+1).Trim();
+                if (factor[++index] == '=') ++index; // == operator
+                string val = factor.Substring(index).Trim();
 
                 switch(prop.ToUpper())
                 {
