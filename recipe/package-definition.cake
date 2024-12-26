@@ -171,8 +171,8 @@ public abstract class PackageDefinition
             OutputDirectory = PackageInstallDirectory,
             //ExcludeVersion = true,
 		    Prerelease = true,
-		    NoCache = true,
-            Verbosity = BuildSettings.NuGetVerbosity
+            Verbosity = BuildSettings.NuGetVerbosity,
+            ArgumentCustomization = args => args.Append("-NoHttpCache")
 	    };
 
         _context.NuGetInstall(PackageId, installSettings);
