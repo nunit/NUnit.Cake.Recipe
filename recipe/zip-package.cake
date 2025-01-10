@@ -65,13 +65,6 @@ public class ZipPackage : PackageDefinition
             BuildSettings.OutputDirectory,
             BuildSettings.ZipImageDirectory + "bin/" );
 
-        var addinsDir = BuildSettings.ZipImageDirectory + "bin/net462/addins/";
-        _context.CreateDirectory(addinsDir);
-
-        foreach (var packageDir in SIO.Directory.GetDirectories(BuildSettings.ExtensionsDirectory))
-        {
-            var files = _context.GetFiles(packageDir + "/tools/*").Concat(_context.GetFiles(packageDir + "/tools/net462/*"));
-            _context.CopyFiles(files.Where(f => f.GetExtension() != ".addins"), addinsDir);
-        }
+        _context.CopyDirectory(BuildSettings.ExtensionsDirectory, BuildSettings.ZipImageDirectory);
     }
 }

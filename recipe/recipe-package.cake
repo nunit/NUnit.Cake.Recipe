@@ -40,6 +40,7 @@ public class RecipePackage : NuGetPackage
         foreach (FilePath filePath in _cakeFiles)
             settings.Files.Add(new NuSpecContent() { Source=$"recipe/{filePath}", Target="content" });
 
+        _context.Information("Calling NuGetPack");
         _context.NuGetPack(PackageSource, settings);
     }
 }
