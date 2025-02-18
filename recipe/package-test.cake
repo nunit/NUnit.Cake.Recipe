@@ -4,73 +4,39 @@
 //  1 Run for all CI tests - that is every time we test packages
 //  2 Run only on PRs, dev builds and when publishing
 //  3 Run only when publishing
-public struct PackageTest
+public class PackageTest
 {
-	public int Level;
-	public string Name;
-	public string Description;
-	public string Arguments;
-	public ExpectedResult ExpectedResult;
-    public IPackageTestRunner[] TestRunners;
-	public ExtensionSpecifier[] ExtensionsNeeded;
+    public int Level { get; private set; }
+    public string Name { get; private set; }
 
-    public PackageTest(int level, string name, string description, string arguments, ExpectedResult expectedResult )
+    public string Description { get; set; }
+    public TestRunner TestRunner { get; set; }
+    public string Arguments { get; set; }
+    public int ExpectedReturnCode { get; set; } = 0;
+    public ExpectedResult ExpectedResult { get; set; }
+    public OutputCheck OutputCheck { get; set; }
+    public ExtensionSpecifier[] ExtensionsNeeded { get; set; } = new ExtensionSpecifier[0];
+    public IPackageTestRunner[] TestRunners { get; set; } = new IPackageTestRunner[0];
+
+    public PackageTest(int level, string name)
     {
         if (name == null)
             throw new ArgumentNullException(nameof(name));
-		if (description == null)
-			throw new ArgumentNullException(nameof(description));
-		if (arguments == null)
-			throw new ArgumentNullException(nameof(arguments));
-		if (expectedResult == null)
-			throw new ArgumentNullException(nameof(expectedResult));
 
-		Level = level;
+        Level = level;
         Name = name;
-        Description = description;
-        Arguments = arguments;
-        ExpectedResult = expectedResult;
-        ExtensionsNeeded = new ExtensionSpecifier[0];
-        TestRunners = new IPackageTestRunner[0];
+        Description = name;
     }
+}
 
-    public PackageTest(int level, string name, string description, string arguments, ExpectedResult expectedResult, params ExtensionSpecifier[] extensionsNeeded )
+public class MultipleRunnerPackageTest : PackageTest
+{ 
+	public MultipleRunnerPackageTest(int level, string name, string description, string arguments, ExpectedResult expectedResult, params IPackageTestRunner[] testRunners )
+        : base(level, name)
     {
-        if (name == null)
-            throw new ArgumentNullException(nameof(name));
-		if (description == null)
-			throw new ArgumentNullException(nameof(description));
-		if (arguments == null)
-			throw new ArgumentNullException(nameof(arguments));
-		if (expectedResult == null)
-			throw new ArgumentNullException(nameof(expectedResult));
-
-		Level = level;
-        Name = name;
-        Description = description;
-        Arguments = arguments;
-        ExpectedResult = expectedResult;
-		ExtensionsNeeded = extensionsNeeded;
-        TestRunners = new IPackageTestRunner[0];
-    }
-
-	public PackageTest(int level, string name, string description, string arguments, ExpectedResult expectedResult, params IPackageTestRunner[] testRunners )
-    {
-        if (name == null)
-            throw new ArgumentNullException(nameof(name));
-		if (description == null)
-			throw new ArgumentNullException(nameof(description));
-		if (arguments == null)
-			throw new ArgumentNullException(nameof(arguments));
-		if (expectedResult == null)
-			throw new ArgumentNullException(nameof(expectedResult));
-
-		Level = level;
-        Name = name;
         Description = description;
         Arguments = arguments;
         ExpectedResult = expectedResult;
 		TestRunners = testRunners;
-        ExtensionsNeeded = new ExtensionSpecifier[0];
     }
 }

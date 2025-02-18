@@ -3,69 +3,94 @@
 /////////////////////////////////////////////////////////////////////////////
 
 /// <Summary>
-/// Common interface for all test runners
-/// </Summary>
-public interface ITestRunner
-{
-	string PackageId { get; }
-	string Version { get; }
-}
-
-/// <Summary>
 /// A runner capable of running unit tests
 /// </Summary>
-public interface IUnitTestRunner : ITestRunner
+public interface IUnitTestRunner
 {
+    string PackageId { get; }
+    string Version { get; }
+    
 	int RunUnitTest(FilePath testPath);
 }
 
 /// <Summary>
 /// A runner capable of running package tests
 /// </Summary>
-public interface IPackageTestRunner : ITestRunner
+public interface IPackageTestRunner
 {
-	int RunPackageTest(string arguments);
+    string PackageId { get; }
+    string Version { get; }
+
+    IEnumerable<string> Output { get; }
+
+    int RunPackageTest(string arguments, bool redirectOutput = false);
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// ABSTRACT TEST RUNNER
+// TEST RUNNER BASE CLASS
 /////////////////////////////////////////////////////////////////////////////
 
 /// <summary>
 /// The TestRunner class is the abstract base for all TestRunners used to run unit-
-/// or package-tests. A TestRunner knows how to run a test assembly and provide a result.
-/// All base functionality is implemented in this class. Derived classes make that
-/// functionality available selectively by implementing specific interfaces.
+/// or package-tests. A TestRunner knows how to run both types of tests. The reason
+/// for this design is that some derived runners are used for unit tests, others for
+/// package tests and still others for both types. Derived classes implement one or
+/// both interfaces to indicate what they support.
 /// </summary>
-public abstract class TestRunner : ITestRunner
+public abstract class TestRunner
 {
 	protected ICakeContext Context => BuildSettings.Context;
 
 	public string PackageId { get; protected set; }
 	public string Version { get; protected set; }
 
-	protected int RunTest(FilePath executablePath, string arguments = null)
-	{
-		return RunTest(executablePath, new ProcessSettings { Arguments = arguments });
-	}
+	public IEnumerable<string> Output { get; protected set; }
 
-	protected int RunTest(FilePath executablePath, ProcessSettings processSettings=null)
+    protected int RunUnitTest(FilePath executablePath, ProcessSettings processSettings)
+    {
+        if (executablePath == null)
+            throw new ArgumentNullException(nameof(executablePath));
+
+        if (processSettings == null)
+            throw new ArgumentNullException(nameof(processSettings));
+
+        // Add default values to settings if not present
+        if (processSettings.WorkingDirectory == null)
+            processSettings.WorkingDirectory = BuildSettings.OutputDirectory;
+
+        return Context.StartProcess(executablePath, processSettings);
+    }
+
+	protected int RunPackageTest(FilePath executablePath, ProcessSettings processSettings)
 	{
 		if (executablePath == null)
 			throw new ArgumentNullException(nameof(executablePath));
 
-		if (processSettings == null)
-			processSettings = new ProcessSettings();
-
+        if (processSettings == null)
+            throw new ArgumentNullException(nameof(processSettings));
+        
 		// Add default values to settings if not present
-		if (processSettings.WorkingDirectory == null)
+        if (processSettings.WorkingDirectory == null)
 			processSettings.WorkingDirectory = BuildSettings.OutputDirectory;
 
-		if (executablePath.GetExtension() == ".dll")
-			return Context.StartProcess("dotnet", processSettings);
-        else
-			return Context.StartProcess(executablePath, processSettings);
+		// Was Output Requested?
+		if (processSettings.RedirectStandardOutput)
+			processSettings.RedirectedStandardOutputHandler = OutputHandler;
+
+		IEnumerable<string> output;
+		// If Redirected Output was not requested, output will be null
+		int rc = Context.StartProcess(executablePath, processSettings, out output);
+		Output = output;
+		return rc;
     }
+
+	internal string OutputHandler(string output)
+	{
+		// Ensure that package test output displays and is also re-directed.
+		// If the derive class doesn't need the output, it doesn't retrieve it.
+		Console.WriteLine(output);
+		return output;
+	}
 }
 
 /// <Summary>
@@ -79,7 +104,7 @@ public abstract class InstallableTestRunner : TestRunner
 		Version = version;
 	}
 
-	protected abstract FilePath ExecutableRelativePath { get; }
+	protected FilePath ExecutableRelativePath { get; set; }
 
 	// Path under tools directory where package would be installed by Cake #tool directive.
 	// NOTE: When used to run unit tests, a #tool directive is required. If derived package
@@ -117,23 +142,13 @@ public abstract class InstallableTestRunner : TestRunner
 /// </Summary>
 public class TestRunnerSource
 {
-	public TestRunnerSource(TestRunner runner1, params TestRunner[] moreRunners)
+	public TestRunnerSource(IPackageTestRunner runner1, params IPackageTestRunner[] moreRunners)
 	{
-		AllRunners.Add(runner1);
-		AllRunners.AddRange(moreRunners);
+		Runners.Add(runner1);
+		Runners.AddRange(moreRunners);
 	}
 
-	public List<TestRunner> AllRunners { get; } = new List<TestRunner>();
-
-	public IEnumerable<IUnitTestRunner> UnitTestRunners
-	{
-		get { foreach(var runner in AllRunners.Where(r => r is IUnitTestRunner)) yield return (IUnitTestRunner)runner; }
-	}
-
-	public IEnumerable<IPackageTestRunner> PackageTestRunners
-	{
-		get { foreach(var runner in AllRunners.Where(r => r is IPackageTestRunner)) yield return (IPackageTestRunner)runner; }
-	}
+	public List<IPackageTestRunner> Runners = new List<IPackageTestRunner>();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -152,7 +167,7 @@ public class NUnitLiteRunner : TestRunner, IUnitTestRunner
                 { "NUNIT_INTERNAL_TRACE_LEVEL", CommandLineOptions.TraceLevel.Value }
             };
 
-        return RunTest(testPath, processSettings);
+        return base.RunUnitTest(testPath, processSettings);
     }
 }
 
@@ -164,43 +179,64 @@ public class NUnitLiteRunner : TestRunner, IUnitTestRunner
 // in the tools directory by use of a #tools directive.
 public class NUnitConsoleRunner : InstallableTestRunner, IUnitTestRunner, IPackageTestRunner
 {
-	protected override FilePath ExecutableRelativePath => "tools/nunit4-console.exe";
-	
-	public NUnitConsoleRunner(string version) : base("NUnit.ConsoleRunner", version) { }
+	public NUnitConsoleRunner(string version) : base("NUnit.ConsoleRunner", version) 
+	{
+        ExecutableRelativePath = version[0] == '3' ? "tools/nunit3-console.exe" : "tools/nunit-console.exe";
+    }
 
-	// Run a unit test
-	public int RunUnitTest(FilePath testPath) => RunTest(ToolInstallDirectory.CombineWithFilePath(ExecutableRelativePath), $"\"{testPath}\" {BuildSettings.UnitTestArguments}");
+    // Run a unit test
+    public int RunUnitTest(FilePath testPath) => 
+		base.RunUnitTest(
+			ToolInstallDirectory.CombineWithFilePath(ExecutableRelativePath), 
+			new ProcessSettings { Arguments = $"\"{testPath}\" {BuildSettings.UnitTestArguments}" });
 
-	// Run a package test
-	public int RunPackageTest(string arguments) => RunTest(ExecutablePath, arguments);
+    // Run a package test
+    public int RunPackageTest(string arguments, bool redirectStandardOutput = false) =>
+        base.RunPackageTest(ExecutablePath, new ProcessSettings { Arguments = arguments, RedirectStandardOutput = redirectStandardOutput });
 }
 
 public class NUnitNetCoreConsoleRunner : InstallableTestRunner, IUnitTestRunner, IPackageTestRunner
 {
-	protected override FilePath ExecutableRelativePath => "tools/net6.0/nunit4-console.exe";
-
-	public NUnitNetCoreConsoleRunner(string version) : base("NUnit.ConsoleRunner.NetCore", version) { }
-
-	// Run a unit test
-	public int RunUnitTest(FilePath testPath) => RunTest(ExecutablePath, $"\"{testPath}\" {BuildSettings.UnitTestArguments}");
-
-	// Run a package test
-	public int RunPackageTest(string arguments) => RunTest(ExecutablePath, arguments);
-}
-
-public class EngineExtensionTestRunner : TestRunner, IPackageTestRunner
-{
-	private IPackageTestRunner[] _runners = new IPackageTestRunner[] {
-		new NUnitConsoleRunner("3.17.0"),
-		new NUnitConsoleRunner("3.15.5")
-	};
-
-	public int RunPackageTest(string arguments)
+	public NUnitNetCoreConsoleRunner(string version) : base("NUnit.ConsoleRunner.NetCore", version)
 	{
-		
-		return _runners[0].RunPackageTest(arguments);
-	}
+        ExecutableRelativePath = version[0] == '3' ? "tools/net8.0/nunit3-console.exe" : "tools/nunit-netcore-console.exe";
+    }
+
+    // Run a unit test
+    public int RunUnitTest(FilePath testPath) => base.RunUnitTest(
+		ExecutablePath, 
+		new ProcessSettings { Arguments = $"\"{testPath}\" {BuildSettings.UnitTestArguments}" });
+
+    // Run a package test
+    public int RunPackageTest(string arguments, bool redirectOutput) => base.RunPackageTest(
+        ExecutablePath,
+        new ProcessSettings { Arguments = arguments, RedirectStandardOutput = redirectOutput });
 }
+
+//public class EngineExtensionTestRunner : TestRunner, IPackageTestRunner
+//{
+//	private IPackageTestRunner[] _runners = new IPackageTestRunner[] {
+//		new NUnitConsoleRunner("3.17.0"),
+//		new NUnitConsoleRunner("3.15.5")
+//	};
+
+//	public int RunPackageTest(string arguments)
+//	{
+
+//		return _runners[0].RunPackageTest(arguments);
+//	}
+
+//    public int RunPackageTest(string arguments, out string output)
+//    {
+//		var settings = new ProcessSettings
+//		{
+//			Arguments = arguments,
+//			RedirectStandardOutput = true
+//		};
+
+//        return RunTest(ExecutablePath, settings, out output);
+//    }
+//}
 
 /////////////////////////////////////////////////////////////////////////////
 // AGENT RUNNER
@@ -222,12 +258,14 @@ public class AgentRunner : TestRunner, IPackageTestRunner
         _x86Executable = x86Executable;
     }
 
-    public int RunPackageTest(string arguments)
+    public int RunPackageTest(string arguments, bool redirectOutput = false)
     {
-		_executablePath = arguments.Contains("--x86")
+        _executablePath = arguments.Contains("--x86")
             ? _x86Executable
             : _stdExecutable;
 
-        return base.RunTest(_executablePath, arguments.Replace("--x86", string.Empty));
-	}
+        return base.RunPackageTest(
+			_executablePath, 
+			new ProcessSettings { Arguments = arguments.Replace("--x86", string.Empty), RedirectStandardOutput = redirectOutput });
+    }
 }

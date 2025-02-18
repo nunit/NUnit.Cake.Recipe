@@ -4,7 +4,7 @@ public class ChocolateyPackage : PackageDefinition
         string id, 
         string source, 
         IPackageTestRunner testRunner = null, 
-        TestRunnerSource testRunnerSource = null,
+        IPackageTestRunner[] testRunners = null,
         PackageCheck[] checks = null, 
         IEnumerable<PackageTest> tests = null)
     : base(
@@ -12,7 +12,7 @@ public class ChocolateyPackage : PackageDefinition
         id, 
         source, 
         testRunner: testRunner, 
-        testRunnerSource: testRunnerSource,
+        testRunners: testRunners,
         checks: checks, 
         tests: tests)
     {
@@ -29,7 +29,7 @@ public class ChocolateyPackage : PackageDefinition
     // The directory used to contain results of package tests for this package
     public override string PackageResultDirectory => BuildSettings.ChocolateyResultDirectory + PackageId + "/";
     // The directory into which extensions to the test runner are installed
-    public override string ExtensionInstallDirectory => BuildSettings.PackageTestDirectory;
+    public override string ExtensionInstallDirectory => BuildSettings.ChocolateyTestDirectory;
     
     public override void BuildPackage()
     {

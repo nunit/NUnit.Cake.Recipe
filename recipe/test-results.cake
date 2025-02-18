@@ -3,7 +3,7 @@
 
 using System.Xml;
 
-public abstract class ResultSummary
+public abstract class TestResultSummary
 {
 	public string OverallResult { get; set; }
 	public int Total  { get; set; }
@@ -14,7 +14,7 @@ public abstract class ResultSummary
 	public int Skipped { get; set; }
 }
 
-public class ExpectedResult : ResultSummary
+public class ExpectedResult : TestResultSummary
 {
 	public ExpectedResult(string overallResult)
 	{
@@ -43,7 +43,7 @@ public class ExpectedAssemblyResult
 	public string Runtime { get; }
 }
 
-public class ActualResult : ResultSummary
+public class ActualResult : TestResultSummary
 {
 	public ActualResult(string resultFile)
 	{

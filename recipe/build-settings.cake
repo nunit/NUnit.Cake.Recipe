@@ -365,16 +365,17 @@ public static class BuildSettings
 		foreach (var package in Packages)
 		{
 			Console.WriteLine(package.PackageId);
-			Console.WriteLine("  PackageType:             " + package.PackageType);
-			Console.WriteLine("  PackageFileName:         " + package.PackageFileName);
-			Console.WriteLine("  PackageInstallDirectory: " + package.PackageInstallDirectory);
-            Console.WriteLine("  PackageTestDirectory:    " + package.PackageTestDirectory);
+			Console.WriteLine("  PackageType:               " + package.PackageType);
+			Console.WriteLine("  PackageFileName:           " + package.PackageFileName);
+			Console.WriteLine("  PackageInstallDirectory:   " + package.PackageInstallDirectory);
+            Console.WriteLine("  PackageTestDirectory:      " + package.PackageTestDirectory);
+			Console.WriteLine("  ExtensionInstallDirectory: " + package.ExtensionInstallDirectory);
 		}
 		var selected = SelectedPackages.Select(p => p.PackageId);
 		if (CommandLineOptions.PackageSelector.Exists)
-			Console.WriteLine("  SelectedPackages:        " + string.Join(", ", selected.ToArray()));
+			Console.WriteLine("  SelectedPackages:          " + string.Join(", ", selected.ToArray()));
 		else
-			Console.WriteLine("  SelectedPackages:        NO SELECTOR SPECIFIED");
+			Console.WriteLine("  SelectedPackages:          NO SELECTOR SPECIFIED");
 
         Console.WriteLine("\nPUBLISHING");
 		Console.WriteLine("ShouldPublishToMyGet:      " + ShouldPublishToMyGet);
