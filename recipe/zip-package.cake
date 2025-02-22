@@ -4,7 +4,7 @@ public class ZipPackage : PackageDefinition
         string id, 
         string source, 
         IPackageTestRunner testRunner = null,
-        TestRunnerSource testRunnerSource = null,
+        IPackageTestRunner[] testRunners = null,
         PackageCheck[] checks = null, 
         IEnumerable<PackageTest> tests = null,
         PackageReference[] bundledExtensions = null )
@@ -13,16 +13,12 @@ public class ZipPackage : PackageDefinition
         id, 
         source, 
         testRunner: testRunner,
-        testRunnerSource: testRunnerSource,
+        testRunners: testRunners,
         checks: checks, 
         tests: tests) 
     {
         BundledExtensions = bundledExtensions;
     }
-
-    // ZIP package supports bundling of extensions
-    public PackageReference[] BundledExtensions { get; }
-    public bool HasBundledExtensions => BundledExtensions != null;
 
     // The file name of this package, including extension
     public override string PackageFileName => $"{PackageId}-{PackageVersion}.zip";

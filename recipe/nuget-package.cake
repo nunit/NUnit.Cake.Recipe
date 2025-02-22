@@ -5,7 +5,7 @@ public class NuGetPackage : PackageDefinition
         string source, 
         string basePath = null,
         IPackageTestRunner testRunner = null,
-        TestRunnerSource testRunnerSource = null,
+        IPackageTestRunner[] testRunners = null,
         PackageCheck[] checks = null, 
         PackageCheck[] symbols = null, 
         IEnumerable<PackageTest> tests = null)
@@ -15,7 +15,7 @@ public class NuGetPackage : PackageDefinition
         source, 
         basePath: basePath,
         testRunner: testRunner, 
-        testRunnerSource: testRunnerSource,
+        testRunners: testRunners,
         checks: checks, 
         symbols: symbols, 
         tests: tests)
@@ -39,7 +39,7 @@ public class NuGetPackage : PackageDefinition
     // The directory used to contain results of package tests for this package
     public override string PackageResultDirectory => BuildSettings.NuGetResultDirectory + PackageId + "/";
     // The directory into which extensions to the test runner are installed
-    public override string ExtensionInstallDirectory => BuildSettings.PackageTestDirectory;
+    public override string ExtensionInstallDirectory => BuildSettings.NuGetTestDirectory;
 
     public override void BuildPackage()
     {

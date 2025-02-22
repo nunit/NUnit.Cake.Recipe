@@ -25,16 +25,16 @@ public abstract class PackageDefinition
         string source,
         string basePath = null, // Defaults to OutputDirectory
         IPackageTestRunner testRunner = null,
-        TestRunnerSource testRunnerSource = null,
+        IPackageTestRunner[] testRunners = null,
         string extraTestArguments = null,
         PackageCheck[] checks = null,
         PackageCheck[] symbols = null,
         IEnumerable<PackageTest> tests = null)
     {
-        if (testRunner == null && testRunnerSource == null && tests != null)
-            throw new System.InvalidOperationException($"Unable to create {packageType} package {id}: TestRunner or TestRunnerSource must be provided if there are tests.");
-        if (testRunner != null && testRunnerSource != null)
-            throw new System.InvalidOperationException($"Unable to create {packageType} package {id}: Either TestRunner or TestRunnerSource must be provided, but not both.");
+        if (testRunner == null && testRunners == null && tests != null)
+            throw new System.InvalidOperationException($"Unable to create {packageType} package {id}: TestRunner or TestRunners must be provided if there are tests.");
+        if (testRunner != null && testRunners != null)
+            throw new System.InvalidOperationException($"Unable to create {packageType} package {id}: Either TestRunner or TestRunners must be provided, but not both.");
 
         _context = BuildSettings.Context;
 
@@ -44,7 +44,7 @@ public abstract class PackageDefinition
         PackageSource = source;
         BasePath = basePath ?? BuildSettings.OutputDirectory;
         TestRunner = testRunner;
-        TestRunnerSource = testRunnerSource;
+        TestRunners = testRunners;
         ExtraTestArguments = extraTestArguments;
         PackageChecks = checks;
         SymbolChecks = symbols;
@@ -56,8 +56,13 @@ public abstract class PackageDefinition
     public string PackageVersion { get; protected set; }
 	public string PackageSource { get; }
     public string BasePath { get; }
+
+    // Defaults to null unless the package sets it.
+    public PackageReference[] BundledExtensions { get; protected set; } = null;
+    public bool HasBundledExtensions => BundledExtensions != null;
+
     public IPackageTestRunner TestRunner { get; }
-    public TestRunnerSource TestRunnerSource { get; }
+    public IPackageTestRunner[] TestRunners { get; }
     public string ExtraTestArguments { get; }
     public PackageCheck[] PackageChecks { get; }
     public PackageCheck[] SymbolChecks { get; protected set; }
@@ -74,9 +79,10 @@ public abstract class PackageDefinition
     public abstract string PackageResultDirectory { get; }
     // The directory into which extensions to the test runner are installed
     public abstract string ExtensionInstallDirectory { get; }
-    
+    // The directory containing the package executable after installation
+    public virtual string PackageTestDirectory => $"{PackageInstallDirectory}{PackageId}.{PackageVersion}/";
+
     public string PackageFilePath => BuildSettings.PackageDirectory + PackageFileName;
-    public string PackageTestDirectory => $"{PackageInstallDirectory}{PackageId}.{PackageVersion}/";
 
     public bool IsSelectedBy(string selectionExpression)
     {
@@ -200,21 +206,17 @@ public abstract class PackageDefinition
 
         _context.CleanDirectory(PackageResultDirectory);
 
-		// Ensure we start out each package with no extensions installed.
-		// If any package test installs an extension, it remains available
-		// for subsequent tests of the same package only. 
-		//foreach (DirectoryPath dirPath in _context.GetDirectories(ExtensionInstallDirectory + "*"))
-        //{
-		//    _context.DeleteDirectory(dirPath, new DeleteDirectorySettings() { Recursive = true });
-		//    _context.Information("Deleted directory " + dirPath.GetDirectoryName());
-        //}
+        // Ensure we start out each package with no extensions installed.
+        // If any package test installs an extension, it remains available
+        // for subsequent tests of the same package only.
+        RemoveExtensions();
 
-        // Package was defined with either a TestRunnerSource or a single TestRunner. In either
-        // case, these will all be package test runners and may or may not require installation.
-        var defaultRunners = TestRunnerSource ?? new TestRunnerSource((TestRunner)TestRunner);
+        // Package was defined with one or more TestRunners. These
+        // may or may not require installation.
+        var defaultRunners = TestRunners ?? new[] { TestRunner };
 
         // Preinstall all runners requiring installation
-        InstallRunners(defaultRunners.PackageTestRunners);
+        InstallRunners(defaultRunners);
 
         foreach (var packageTest in PackageTests)
         {
@@ -225,13 +227,13 @@ public abstract class PackageDefinition
             InstallRunners(packageTest.TestRunners);
 
             // Use runners from the test if provided, otherwise the default runners
-            var runners = packageTest.TestRunners.Length > 0 ? packageTest.TestRunners : defaultRunners.PackageTestRunners;
-            
+            var runners = packageTest.TestRunners.Length > 0 ? packageTest.TestRunners : defaultRunners;
+
             foreach (var runner in runners)
             {
                 Console.WriteLine(runner.Version);
-                var testResultDir = $"{PackageResultDirectory}/{packageTest.Name}/";
-                var resultFile = testResultDir + "TestResult.xml";
+                string testResultDir = $"{PackageResultDirectory}/{packageTest.Name}/";
+                string resultFile = testResultDir + "TestResult.xml";
 
                 Banner.Display(packageTest.Description);
 
@@ -239,13 +241,15 @@ public abstract class PackageDefinition
                 string arguments = $"{packageTest.Arguments} {ExtraTestArguments} --work={testResultDir}";
                 if (CommandLineOptions.TraceLevel.Value != "Off")
                     arguments += $" --trace:{CommandLineOptions.TraceLevel.Value}";
+                bool redirectOutput = packageTest.OutputCheck != null;
 
-                int rc = runner.RunPackageTest(arguments);
+                int rc = runner.RunPackageTest(arguments, redirectOutput);
 
+                var actualResult = packageTest.ExpectedResult != null ? new ActualResult(resultFile) : null;
+ 
                 try
                 {
-                    var result = new ActualResult(resultFile);
-                    var report = new PackageTestReport(packageTest, result, runner);
+                    var report = new PackageTestReport(packageTest, actualResult, runner);
                     reporter.AddReport(report);
 
                     Console.WriteLine(report.Errors.Count == 0
@@ -258,6 +262,15 @@ public abstract class PackageDefinition
 
                     Console.WriteLine("\nERROR: No result found!");
                 }
+
+                //else
+                //{
+                //    var report = new PackageTestReport(packageTest, rc, runner);
+                //    reporter.AddReport(report);
+
+                //    if (rc != packageTest.ExpectedReturnCode)
+                //        Console.WriteLine($"\nERROR: Expected rc = {packageTest.ExpectedReturnCode} but got {rc}!");
+                //}
             }
         }
 
@@ -281,6 +294,21 @@ public abstract class PackageDefinition
     {
         foreach (ExtensionSpecifier extension in extensionsNeeded)
             extension.InstallExtension(this);
+    }
+
+    // Remove all extensions prior to starting a run. Note that we avoid removing the the
+    // package being developed, which may actually be an extension itself.
+    protected void RemoveExtensions()
+    {
+        foreach (DirectoryPath dirPath in _context.GetDirectories(ExtensionInstallDirectory + "*"))
+        {
+            string dirName = dirPath.Segments.Last();
+            if ((dirName.StartsWith("NUnit.Extension.") || dirName.StartsWith("nunit-extension-")) && !dirName.StartsWith(PackageId))
+            {
+                _context.DeleteDirectory(dirPath, new DeleteDirectorySettings() { Recursive = true });
+                _context.Information("Deleted directory " + dirPath.GetDirectoryName());
+            }
+        }
     }
 
     private void InstallRunners(IEnumerable<IPackageTestRunner> runners)

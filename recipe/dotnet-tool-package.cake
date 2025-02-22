@@ -6,7 +6,7 @@ public class DotNetToolPackage : NuGetPackage
         string source, 
         string basePath = null,
         IPackageTestRunner testRunner = null,
-        TestRunnerSource testRunnerSource = null,
+        IPackageTestRunner[] testRunners = null,
         PackageCheck[] checks = null, 
         PackageCheck[] symbols = null, 
         IEnumerable<PackageTest> tests = null)
@@ -15,17 +15,19 @@ public class DotNetToolPackage : NuGetPackage
         source, 
         basePath: basePath,
         testRunner: testRunner, 
-        testRunnerSource: testRunnerSource,
+        testRunners: testRunners,
         checks: checks, 
         symbols: symbols, 
         tests: tests)
     {
     }
 
+    public override string PackageTestDirectory => PackageInstallDirectory;
+
     public override void InstallPackage()
     {
         var arguments = $"tool install {PackageId} --version {BuildSettings.PackageVersion} " + 
-            $"--add-source \"{BuildSettings.PackageDirectory}\" --tool-path \"{PackageTestDirectory}\"";
+            $"--add-source \"{BuildSettings.PackageDirectory}\" --tool-path \"{PackageInstallDirectory}\"";
         Console.WriteLine($"Executing dotnet {arguments}");
         _context.StartProcess("dotnet", arguments);
     }

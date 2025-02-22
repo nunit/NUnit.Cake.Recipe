@@ -1,3 +1,5 @@
+using Cake.Git;
+
 public static class PackageReleaseManager
 {
 	private static ICakeContext _context;
