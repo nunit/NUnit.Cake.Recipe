@@ -20,8 +20,8 @@ public class NuGetPackage : PackageDefinition
         symbols: symbols, 
         tests: tests)
     {
-        if (!source.EndsWith(".nuspec"))
-            throw new ArgumentException("Source must be a nuspec file", nameof(source));
+        //if (!source.EndsWith(".nuspec"))
+        //    throw new ArgumentException("Source must be a nuspec file", nameof(source));
 
         if (symbols != null)
         {
@@ -43,7 +43,7 @@ public class NuGetPackage : PackageDefinition
 
     public override void BuildPackage()
     {
-        var nugetPackSettings = new NuGetPackSettings()
+        var NuGetPackSettings = new NuGetPackSettings()
         {
             Version = PackageVersion,
             BasePath = BasePath,
@@ -54,8 +54,49 @@ public class NuGetPackage : PackageDefinition
         };
 
         if (HasSymbols)
-            nugetPackSettings.SymbolPackageFormat = "snupkg";
+            NuGetPackSettings.SymbolPackageFormat = "snupkg";
 
-        _context.NuGetPack(PackageSource, nugetPackSettings);
+        if (string.IsNullOrEmpty(PackageSource))
+            _context.NuGetPack(NuGetPackSettings);
+        else if (PackageSource.EndsWith(".nuspec"))
+            _context.NuGetPack(PackageSource, NuGetPackSettings);
+        else if (PackageSource.EndsWith(".csproj"))
+            _context.MSBuild(PackageSource,
+                new MSBuildSettings
+                {
+                    Target = "pack",
+                    Verbosity = BuildSettings.MSBuildVerbosity,
+                    Configuration = BuildSettings.Configuration,
+                    PlatformTarget = PlatformTarget.MSIL,
+                    //AllowPreviewVersion = BuildSettings.MSBuildAllowPreviewVersion
+                }.WithProperty("Version", BuildSettings.PackageVersion));
+        else
+            throw new ArgumentException(
+                $"Invalid package source specified: {PackageSource}", "source");
+    }
+
+    public override void VerifySymbolPackage()
+    {
+        if (!SIO.File.Exists(BuildSettings.PackageDirectory + SymbolPackageName))
+        {
+            _context.Error($"  ERROR: File {SymbolPackageName} was not found.");
+            throw new Exception("Verification Failed!");
+        }
+
+        string tempDir = SIO.Directory.CreateTempSubdirectory().FullName;
+        _context.Unzip(BuildSettings.PackageDirectory + SymbolPackageName, tempDir);
+
+        bool allOK = true;
+
+        if (allOK && SymbolChecks != null)
+            foreach (var check in SymbolChecks)
+                allOK &= check.ApplyTo(tempDir);
+
+        SIO.Directory.Delete(tempDir, true);
+
+        if (allOK)
+            Console.WriteLine("All checks passed!");
+        else
+            throw new Exception("Verification failed!");
     }
 }

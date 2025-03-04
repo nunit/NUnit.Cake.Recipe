@@ -141,6 +141,7 @@ public abstract class PackageDefinition
 
         if (SymbolChecks != null)
         {
+            Banner.Display($"Verifying {SymbolPackageName}");
             // TODO: Override this in NuGetPackage
             VerifySymbolPackage();
         }
