@@ -105,13 +105,16 @@ public abstract class InstallableTestRunner : TestRunner
 	}
 
 	protected FilePath ExecutableRelativePath { get; set; }
+	protected bool IsDotNetTool { get; set; } = false;
 
 	// Path under tools directory where package would be installed by Cake #tool directive.
 	// NOTE: When used to run unit tests, a #tool directive is required. If derived package
 	// is only used for package tests, it is optional.
-	protected DirectoryPath ToolInstallDirectory => BuildSettings.ToolsDirectory + $"{PackageId}.{Version}"; 
+	protected DirectoryPath ToolInstallDirectory => IsDotNetTool
+		? BuildSettings.ToolsDirectory
+		: BuildSettings.ToolsDirectory + $"{PackageId}.{Version}";
 	protected bool IsInstalledAsTool =>
-		ToolInstallDirectory != null && Context.DirectoryExists(ToolInstallDirectory);
+		Context.DirectoryExists(ToolInstallDirectory);
 	
 	protected DirectoryPath InstallDirectory;
 
@@ -120,10 +123,17 @@ public abstract class InstallableTestRunner : TestRunner
 	public void Install(DirectoryPath installDirectory)
 	{
 		InstallDirectory = installDirectory.Combine($"{PackageId}.{Version}");
+		Context.CreateDirectory(InstallDirectory);
 
 		// If the runner package is already installed as a cake tool, we just copy it
 		if (IsInstalledAsTool)
-			Context.CopyDirectory(ToolInstallDirectory, InstallDirectory);
+			if (IsDotNetTool)
+			{
+				Context.CopyFileToDirectory(BuildSettings.ToolsDirectory + ExecutableRelativePath, InstallDirectory);
+				Context.CopyDirectory(BuildSettings.ToolsDirectory + ".store", InstallDirectory);
+			}
+			else
+				Context.CopyDirectory(ToolInstallDirectory, InstallDirectory);
 		// Otherwise, we install it to the requested location
 		else
 			Context.NuGetInstall(
@@ -199,7 +209,8 @@ public class NUnitNetCoreConsoleRunner : InstallableTestRunner, IUnitTestRunner,
 {
 	public NUnitNetCoreConsoleRunner(string version) : base("NUnit.ConsoleRunner.NetCore", version)
 	{
-        ExecutableRelativePath = version[0] == '3' ? "tools/net8.0/nunit3-console.exe" : "tools/nunit-netcore-console.exe";
+		IsDotNetTool = true;
+        ExecutableRelativePath = version[0] == '3' ? "tools/net8.0/nunit3-console.exe" : "nunit.exe";
     }
 
     // Run a unit test
