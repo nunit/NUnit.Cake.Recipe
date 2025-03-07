@@ -185,43 +185,51 @@ public class NUnitLiteRunner : TestRunner, IUnitTestRunner
 // NUNIT CONSOLE RUNNERS
 /////////////////////////////////////////////////////////////////////////////
 
-// NUnitConsoleRunner is used for both unit and package tests. It must be pre-installed
-// in the tools directory by use of a #tools directive.
-public class NUnitConsoleRunner : InstallableTestRunner, IUnitTestRunner, IPackageTestRunner
+// NUnitConsoleRunner is used for both unit and package tests. It is normally
+// pre-installed in the tools directory by use of a #tools directive.
+
+// Abstract base for runners based on any of the NUnit Console Runners
+public abstract class NUnitConsoleRunnerBase : InstallableTestRunner, IUnitTestRunner, IPackageTestRunner
 {
-	public NUnitConsoleRunner(string version) : base("NUnit.ConsoleRunner", version) 
-	{
-        ExecutableRelativePath = version[0] == '3' ? "tools/nunit3-console.exe" : "tools/nunit-console.exe";
-    }
+    public NUnitConsoleRunnerBase(string packageId, string version) : base(packageId, version) { }
 
     // Run a unit test
-    public int RunUnitTest(FilePath testPath) => 
-		base.RunUnitTest(
-			ToolInstallDirectory.CombineWithFilePath(ExecutableRelativePath), 
-			new ProcessSettings { Arguments = $"\"{testPath}\" {BuildSettings.UnitTestArguments}" });
+    public int RunUnitTest(FilePath testPath) =>
+        base.RunUnitTest(
+            ToolInstallDirectory.CombineWithFilePath(ExecutableRelativePath),
+            new ProcessSettings { Arguments = $"\"{testPath}\" {BuildSettings.UnitTestArguments}" });
 
     // Run a package test
     public int RunPackageTest(string arguments, bool redirectStandardOutput = false) =>
         base.RunPackageTest(ExecutablePath, new ProcessSettings { Arguments = arguments, RedirectStandardOutput = redirectStandardOutput });
 }
 
-public class NUnitNetCoreConsoleRunner : InstallableTestRunner, IUnitTestRunner, IPackageTestRunner
+// The standard v3/v4 console runner, running under .NET Framework and using agents
+public class NUnitConsoleRunner : NUnitConsoleRunnerBase
 {
-	public NUnitNetCoreConsoleRunner(string version) : base("NUnit.ConsoleRunner.NetCore", version)
-	{
-		IsDotNetTool = true;
-        ExecutableRelativePath = version[0] == '3' ? "tools/net8.0/nunit3-console.exe" : "nunit.exe";
+    public NUnitConsoleRunner(string version) : base("NUnit.ConsoleRunner", version)
+    {
+        ExecutableRelativePath = version[0] == '3' ? "tools/nunit3-console.exe" : "tools/nunit-console.exe";
     }
+}
 
-    // Run a unit test
-    public int RunUnitTest(FilePath testPath) => base.RunUnitTest(
-		ExecutablePath, 
-		new ProcessSettings { Arguments = $"\"{testPath}\" {BuildSettings.UnitTestArguments}" });
+// The v3 netcore console runner
+public class NUnit3NetCoreConsoleRunner : NUnitConsoleRunnerBase
+{
+    public NUnit3NetCoreConsoleRunner(string version) : base("NUnit.ConsoleRunner.NetCore", version)
+    {
+        ExecutableRelativePath = "tools/net8.0/nunit3-console.exe";
+    }
+}
 
-    // Run a package test
-    public int RunPackageTest(string arguments, bool redirectOutput) => base.RunPackageTest(
-        ExecutablePath,
-        new ProcessSettings { Arguments = arguments, RedirectStandardOutput = redirectOutput });
+// The v4 console runner
+public class NUnit4DotNetRunner : NUnitConsoleRunnerBase
+{
+    public NUnit4DotNetRunner(string version) : base("NUnit.ConsoleRunner.NetCore", version)
+    {
+        IsDotNetTool = true;
+        ExecutableRelativePath = "nunit.exe";
+    }
 }
 
 //public class EngineExtensionTestRunner : TestRunner, IPackageTestRunner
