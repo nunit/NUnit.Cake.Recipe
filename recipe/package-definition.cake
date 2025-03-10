@@ -324,20 +324,47 @@ public abstract class PackageDefinition
     {
         runner.Install(PackageInstallDirectory);
 
-		// We are using nuget packages for the runner, so it won't normally recognize
-		// chocolatey extensions. We add an extra addins file for that purpose.
-        if (PackageType == PackageType.Chocolatey)
+        switch(PackageType)
         {
-            var filePath = runner.ExecutablePath.GetDirectory().CombineWithFilePath("choco.engine.addins").ToString();
-            Console.WriteLine($"Creating {filePath}");
+            case PackageType.Chocolatey:
+		        // We are using nuget packages for the runner, so it won't normally recognize
+		        // chocolatey extensions. We add an extra addins file and a VERIFICATION.txt file
+                // for that purpose. The addins file is used in all releases up to 3.18. For
+                // release 3.19 and higher, the VERIFICATION.txt file is checked to determine
+                // whether this is a chocolatey package. Since the extra files do no harm
+                // where they are not used, we create them in all cases.
+                var addinsFile = runner.ExecutablePath.GetDirectory().CombineWithFilePath("choco.engine.addins").ToString();
+                Console.WriteLine($"Creating {addinsFile}");
 
-			using (var writer = new StreamWriter(filePath))
-			{
-				writer.WriteLine("../../nunit-extension-*/tools/");
-				writer.WriteLine("../../nunit-extension-*/tools/*/");
-				writer.WriteLine("../../../nunit-extension-*/tools/");
-				writer.WriteLine("../../../nunit-extension-*/tools/*/");
-			}
+			    using (var writer = new StreamWriter(addinsFile))
+			    {
+				    writer.WriteLine("../../nunit-extension-*/tools/");
+				    writer.WriteLine("../../nunit-extension-*/tools/*/");
+                    writer.WriteLine("../../../nunit-extension-*/tools/");
+                    writer.WriteLine("../../../nunit-extension-*/tools/*/");
+                    writer.WriteLine("../../../../nunit-extension-*/tools/");
+                    writer.WriteLine("../../../../nunit-extension-*/tools/*/");
+                }
+
+                var verificationFile = runner.ExecutablePath.GetDirectory().CombineWithFilePath("VERIFICATION.txt").ToString();
+                using (var writer = new StreamWriter(verificationFile))
+                {
+                    writer.WriteLine("Simulated VERIFICATION file to force runner to use chocolatey extensions");
+                }
+                break;
+
+            case PackageType.NuGet:
+                // Special handling for testing under version 3.18
+                if (runner.Version.StartsWith("3.18."))
+                {
+                    addinsFile = runner.ExecutablePath.GetDirectory().CombineWithFilePath("extra.nuget.engine.addins").ToString();
+                    using (var writer = new StreamWriter(addinsFile))
+                    {
+                        writer.WriteLine("../../../../NUnit.Extension.*/tools/");
+                        writer.WriteLine("../../../../NUnit.Extension.*/tools/*/");
+                    }
+                }
+                break;
         }
     }
 
