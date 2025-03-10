@@ -104,6 +104,8 @@ public abstract class InstallableTestRunner : TestRunner
 		Version = version;
 	}
 
+	//private bool IsChocolateyPackage => PackageId.Contains('-'); // Hack!
+
 	protected FilePath ExecutableRelativePath { get; set; }
 	protected bool IsDotNetTool { get; set; } = false;
 
@@ -122,6 +124,7 @@ public abstract class InstallableTestRunner : TestRunner
 
 	public void Install(DirectoryPath installDirectory)
 	{
+		Context.Information($"Installing runner {PackageId} {Version} to directory {installDirectory}");
 		InstallDirectory = installDirectory.Combine($"{PackageId}.{Version}");
 		Context.CreateDirectory(InstallDirectory);
 
@@ -135,11 +138,11 @@ public abstract class InstallableTestRunner : TestRunner
 			else
 				Context.CopyDirectory(ToolInstallDirectory, InstallDirectory);
 		// Otherwise, we install it to the requested location
-		else
-			Context.NuGetInstall(
-				PackageId,
-				new NuGetInstallSettings() { OutputDirectory = installDirectory, Version = Version });
-	}
+        else
+            Context.NuGetInstall(
+                PackageId,
+                new NuGetInstallSettings() { OutputDirectory = installDirectory, Version = Version });
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -207,7 +210,7 @@ public abstract class NUnitConsoleRunnerBase : InstallableTestRunner, IUnitTestR
 // The standard v3/v4 console runner, running under .NET Framework and using agents
 public class NUnitConsoleRunner : NUnitConsoleRunnerBase
 {
-    public NUnitConsoleRunner(string version) : base("NUnit.ConsoleRunner", version)
+    public NUnitConsoleRunner(string packageId, string version) : base(packageId, version)
     {
         ExecutableRelativePath = version[0] == '3' ? "tools/nunit3-console.exe" : "tools/nunit-console.exe";
     }
@@ -216,16 +219,17 @@ public class NUnitConsoleRunner : NUnitConsoleRunnerBase
 // The v3 netcore console runner
 public class NUnit3NetCoreConsoleRunner : NUnitConsoleRunnerBase
 {
-    public NUnit3NetCoreConsoleRunner(string version) : base("NUnit.ConsoleRunner.NetCore", version)
+    public NUnit3NetCoreConsoleRunner(string packageId, string version, string executable)
+		: base(packageId, version)
     {
-        ExecutableRelativePath = "tools/net8.0/nunit3-console.exe";
+        ExecutableRelativePath = executable;
     }
 }
 
 // The v4 console runner
 public class NUnit4DotNetRunner : NUnitConsoleRunnerBase
 {
-    public NUnit4DotNetRunner(string version) : base("NUnit.ConsoleRunner.NetCore", version)
+    public NUnit4DotNetRunner(string packageId, string version) : base(packageId, version)
     {
         IsDotNetTool = true;
         ExecutableRelativePath = "nunit.exe";
