@@ -13,7 +13,7 @@ public static class KnownExtensions
 	public static ExtensionSpecifier NUnitV2ResultWriter = new ExtensionSpecifier(
 		"NUnit.Extension.NUnitV2ResultWriter", "nunit-extension-nunit-v2-result-writer", "3.8.0");
 	public static ExtensionSpecifier TeamCityEventListener = new ExtensionSpecifier(
-		"NUnit.Extension.TeamCityEventListener", "nunit-extension-teamcity-event-listener", "1.0.7");
+		"NUnit.Extension.TeamCityEventListener", "nunit-extension-teamcity-event-listener", "1.0.9");
 }
 
 // Representation of an extension, for use by PackageTests. Because our
