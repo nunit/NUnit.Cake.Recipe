@@ -87,10 +87,8 @@ BuildTasks.PackageTask = Task("Package")
 	.IsDependentOn("Build")
 	.Description("Build, Install, Verify and Test all packages")
 	.Does(() => {
-        var selector = CommandLineOptions.PackageSelector;
-		foreach(var package in BuildSettings.Packages)
-            if (!selector.Exists || package.IsSelectedBy(selector.Value))
-    			package.BuildVerifyAndTest();
+		foreach(var package in BuildSettings.SelectedPackages)
+    		package.BuildVerifyAndTest();
 	});
 
 BuildTasks.BuildTestAndPackageTask = Task("BuildTestAndPackage")

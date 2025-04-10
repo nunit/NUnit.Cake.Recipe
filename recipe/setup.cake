@@ -38,15 +38,26 @@ Setup((context) =>
 		}
 
 	// SelectedPackages
-    bool hasSelector = CommandLineOptions.PackageSelector.Exists;
-    string selector = CommandLineOptions.PackageSelector.Value;
+    string id = CommandLineOptions.PackageId.Value;
+	string type = CommandLineOptions.PackageType.Value?.ToLower();
 
     foreach (var package in BuildSettings.Packages)
-        if (!hasSelector || package.IsSelectedBy(selector))
+        if ((id == null || id == package.PackageId.ToString()) && (type == null || type == package.PackageType.ToString().ToLower()))
             BuildSettings.SelectedPackages.Add(package);
 
-    if (hasSelector && BuildSettings.SelectedPackages.Count == 0)
-		DisplayErrorAndThrow("Specified --where option does not match any packages");
+	if (BuildSettings.SelectedPackages.Count == 0)
+	{
+		if (id == null && type == null)
+			DisplayErrorAndThrow("No packages have been defined");
+
+		string msg = "No package found ";
+        if (type != null)
+            msg += $" of type {type}";
+        if (id != null)
+            msg += $" with id ${id}";
+
+		DisplayErrorAndThrow(msg);
+	}
 
 	// Add settings to BuildSettings
 	BuildSettings.Target = target;
