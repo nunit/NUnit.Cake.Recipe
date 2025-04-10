@@ -40,7 +40,9 @@ public class ZipPackage : PackageDefinition
 
     public override void InstallPackage()
     {
-        _context.Unzip($"{BuildSettings.PackageDirectory}{PackageFileName}", $"{PackageInstallDirectory}{PackageId}.{PackageVersion}");
+        var packageInstallationDir = $"{PackageInstallDirectory}{PackageId}.{PackageVersion}";
+        _context.CleanDirectory(packageInstallationDir);
+        _context.Unzip($"{BuildSettings.PackageDirectory}{PackageFileName}", packageInstallationDir);
     }
 
     protected override void InstallExtensions(ExtensionSpecifier[] extensionsNeeded)
