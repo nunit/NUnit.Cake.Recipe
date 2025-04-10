@@ -34,7 +34,7 @@ public static class CommandLineOptions
 
         Configuration = new ValueOption<String>("configuration|c", DEFAULT_CONFIGURATION);
 		
-        PackageVersion = new ValueOption<string>("packageVersion|p", null);
+        PackageVersion = new ValueOption<string>("packageVersion", null);
 
         PackageId = new ValueOption<string>("packageId|id", null);
 
