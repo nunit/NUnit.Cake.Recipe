@@ -51,8 +51,8 @@ public class ActualResult : TestResultSummary
 		doc.Load(resultFile);
 
 		Xml = doc.DocumentElement;
-		if (Xml.Name != "test-run")
-			throw new Exception("The test-run element was not found.");
+		if (Xml.Name != "test-run" && Xml.Name != "test-suite")
+			throw new Exception("Top-level <test-run> or <test-suite> element not found.");
 
 		OverallResult = GetAttribute(Xml, "result");
 		Total = IntAttribute(Xml, "total");
@@ -63,13 +63,9 @@ public class ActualResult : TestResultSummary
 		Skipped = IntAttribute(Xml, "skipped");
 
 		var assemblies = new List<ActualAssemblyResult>();
-		//var engineVersion = new Version(GetAttribute(Xml, "engine-version"));
 
 		foreach (XmlNode node in Xml.SelectNodes("//test-suite[@type='Assembly']"))
 			assemblies.Add(new ActualAssemblyResult(node));
-
-		//foreach (XmlNode node in Xml.SelectNodes("//test-suite[@type='Assembly']"))
-		//	assemblies.Add(new ActualAssemblyResult(node, engineVersion));
 
 		Assemblies = assemblies.ToArray();
 	}
