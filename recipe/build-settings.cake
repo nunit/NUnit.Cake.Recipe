@@ -278,11 +278,21 @@ public static class BuildSettings
 	public static bool ShouldPublishToMyGet =>
 		!IsPreRelease || LABELS_WE_PUBLISH_ON_MYGET.Contains(BuildVersion.PreReleaseLabel);
 	public static bool ShouldPublishToNuGet =>
-		!IsPreRelease || LABELS_WE_PUBLISH_ON_NUGET.Contains(BuildVersion.PreReleaseLabel);
+		!IsPreRelease || LABELS_WE_PUBLISH_ON_NUGET.Contains(BuildVersion.PreReleaseLabel) && !IsFractionalPreRelease;
 	public static bool ShouldPublishToChocolatey =>
-		!IsPreRelease || LABELS_WE_PUBLISH_ON_CHOCOLATEY.Contains(BuildVersion.PreReleaseLabel);
+		!IsPreRelease || LABELS_WE_PUBLISH_ON_CHOCOLATEY.Contains(BuildVersion.PreReleaseLabel) && !IsFractionalPreRelease;
 	public static bool ShouldPublishToGitHub =>
-		!IsPreRelease || LABELS_WE_PUBLISH_ON_GITHUB.Contains(BuildVersion.PreReleaseLabel);
+		!IsPreRelease || LABELS_WE_PUBLISH_ON_GITHUB.Contains(BuildVersion.PreReleaseLabel) && !IsFractionalPreRelease;
+	public static bool IsFractionalPreRelease
+	{
+		get
+        {
+			int dots = 0;
+			foreach (char c in BuildVersion.PreReleaseSuffix)
+				if (c == '.') dots++;
+			return dots > 1;
+        }
+    }
 
 	private static void ValidateSettings()
 	{
