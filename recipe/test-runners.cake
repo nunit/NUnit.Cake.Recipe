@@ -63,6 +63,11 @@ public abstract class TestRunner
         if (processSettings.WorkingDirectory == null)
             processSettings.WorkingDirectory = BuildSettings.OutputDirectory;
 
+        var traceLevel = CommandLineOptions.TraceLevel.Value;
+        if (traceLevel != "Off")
+            processSettings.Arguments.Append($" --trace:{traceLevel}");
+
+        Console.WriteLine($"Arguments: {processSettings.Arguments.Render()}");
         return Context.StartProcess(executablePath, processSettings);
     }
 

@@ -42,7 +42,8 @@
 
             --trace, --tr=LEVEL
                 Specifies the default trace level for this run. Values are Off,
-                Error, Warning, Info or Debug. Default is Off.
+                Error, Warning, Info or Debug. Default is Off. If used, this option
+                affects the trace level for both unit and package tests.
 
             --nobuild, --nob
                 Indicates that the Build task should not be run even if other
