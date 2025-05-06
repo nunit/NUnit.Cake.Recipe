@@ -1,34 +1,23 @@
-public class DotnetInfo
+public static class Dotnet
 {
     // Experimenting with finding dotnet installs for X64 vs x86
     // This code will end up moved into the engine as well.
 
-    private ICakeContext _context;
-    private bool _onWindows;
-
-    public DotnetInfo(ICakeContext context)
-    {
-        _context = context;
-        _onWindows = context.IsRunningOnWindows();
-
-        InstallPath = GetDotnetInstallDirectory(false);
-        X86InstallPath = GetDotnetInstallDirectory(true);
-    }
+    private static ICakeContext _context = BuildSettings.Context;
+    private static bool _onWindows = SIO.Path.DirectorySeparatorChar == '\\';
 
     // NOTES:
     // * We don't need an IsInstalled property because our scripts all run under dotnet.
 
-    public bool IsX86Installed => SIO.Directory.Exists(X86InstallPath) && SIO.File.Exists(X86Executable);
+    public static string InstallPath { get; } = GetDotnetInstallDirectory(false);
+    public static string X86InstallPath { get; } = GetDotnetInstallDirectory(true);
 
-    public string InstallPath { get; }
-    public string Executable => InstallPath + "dotnet.exe";
-    public List<string> Runtimes { get; }
+    // These three properties use => to avoid issues with initialization order!
+    public static string Executable => InstallPath + "dotnet.exe";
+    public static string X86Executable => X86InstallPath + "dotnet.exe";
+    public static bool IsX86Installed => SIO.Directory.Exists(X86InstallPath) && SIO.File.Exists(X86Executable);
 
-    public string X86InstallPath { get; }
-    public string X86Executable => X86InstallPath + "dotnet.exe";
-    public List<string> X86Runtimes { get; }
-
-    public void Display()
+    public static void Display()
     {
         _context.Information($"Install Path:      {InstallPath}");
         _context.Information($"Executable:        {Executable}");
@@ -62,7 +51,7 @@ public class DotnetInfo
             _context.Information("\nDotnet X86 is not installed");
     }
 
-    private string GetDotnetInstallDirectory(bool forX86 = false)
+    private static string GetDotnetInstallDirectory(bool forX86 = false)
     {
         if (_onWindows)
         {
@@ -85,4 +74,4 @@ public class DotnetInfo
 }
 
 // Use this task to verify that the script understands the dotnet environment
-Task("DotnetInfo").Does(() => { new DotnetInfo(Context).Display(); });
+Task("DotnetInfo").Does(() => { Dotnet.Display(); });
