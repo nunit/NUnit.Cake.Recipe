@@ -280,45 +280,27 @@ public class NUnit4DotNetRunner : NUnitConsoleRunnerBase
 /// </summary>
 public class AgentRunner : TestRunner, IPackageTestRunner
 {
-    private string _agentOrDirectoryPath;
-    bool initialized = false;
-    private DirectoryPath _agentBaseDirectory;
     private FilePath _agentPath;
-    
-    public AgentRunner(string agentOrDirectoryPath)
-    {
-        if (agentOrDirectoryPath == null)
-            throw new ArgumentNullException("Null argument", nameof(agentOrDirectoryPath));
 
-        _agentOrDirectoryPath = agentOrDirectoryPath;
+    public AgentRunner(FilePath agentPath)
+    {
+        if (agentPath == null)
+            throw new ArgumentNullException("Null argument", nameof(agentPath));
+
+        _agentPath = agentPath;
     }
 
     public int RunPackageTest(string arguments, bool redirectOutput = false)
     {
-        InitializeRunnerPaths();
-
         string runtime = arguments.Contains("net462") ? "net462" : "net8.0";
         bool isX86 = arguments.Contains("x86");
         arguments = arguments.Replace("--x86", string.Empty);
 
-        if (_agentBaseDirectory != null)
-        {
-            if (!SIO.Directory.Exists(_agentBaseDirectory.ToString()))
-                throw new DirectoryNotFoundException($"Directory not found: {_agentBaseDirectory}");
-
-            DirectoryPath agentDirectory = _agentBaseDirectory.Combine(runtime);
-            string agentName = runtime == "net462"
-                ? isX86 ? "nunit-agent-net462-x86.exe" : "nunit-agent-net462.exe"
-                : "nunit-agent-net80.dll";
-            _agentPath = agentDirectory.CombineWithFilePath(agentName);
-        }
-
-        Console.WriteLine($"RunPackageTest using {_agentPath}");
-
         if (runtime == "net462")
         {
+            var agentPath = isX86 ? MakeX86AgentPath() : _agentPath;
             var settings = new ProcessSettings() { Arguments = arguments, RedirectStandardOutput = redirectOutput };
-            return base.RunPackageTest(_agentPath, settings);
+            return base.RunPackageTest(agentPath, settings);
         }
         else // must be "net8.0"
         {
@@ -328,21 +310,47 @@ public class AgentRunner : TestRunner, IPackageTestRunner
         }
     }
 
-    private bool _initialized = false;
-    private void InitializeRunnerPaths()
+    private FilePath MakeX86AgentPath()
     {
-        if (!_initialized)
-        {
-            _initialized = true;
-
-            if (SIO.File.Exists(_agentOrDirectoryPath))
-                _agentPath = _agentOrDirectoryPath;
-            else
-            if (SIO.Directory.Exists(_agentOrDirectoryPath))
-                _agentBaseDirectory = _agentOrDirectoryPath;
-            else
-                throw new Exception($"The path '{_agentOrDirectoryPath}' was not found.");
-        }
+        DirectoryPath dir = _agentPath.GetDirectory();
+        FilePath file = FilePath.FromString(_agentPath.GetFilenameWithoutExtension().ToString() + "-x86");
+        string ext = _agentPath.GetExtension();
+        return dir.CombineWithFilePath(file.AppendExtension(ext));
     }
 }
 
+public class AgentSelector : TestRunner, IPackageTestRunner
+{
+    private DirectoryPath _agentBaseDirectory;
+
+    public AgentSelector(string agentBaseDirectory)
+    {
+        if (agentBaseDirectory == null)
+            throw new ArgumentNullException("Null argument", nameof(agentBaseDirectory));
+
+        _agentBaseDirectory = agentBaseDirectory;
+    }
+
+    public int RunPackageTest(string arguments, bool redirectOutput = false)
+    {
+        if (!SIO.Directory.Exists(_agentBaseDirectory.ToString()))
+            throw new DirectoryNotFoundException($"Directory not found: {_agentBaseDirectory}");
+
+        bool isX86 = arguments.Contains("x86");
+        arguments = arguments.Replace("--x86", string.Empty);
+
+        if (arguments.Contains("net462"))
+        {
+            var agentPath = _agentBaseDirectory.CombineWithFilePath(isX86 ? "net462/nunit-agent-net462-x86.exe" : "net462/nunit-agent-net462.exe");
+            var settings = new ProcessSettings() { Arguments = arguments, RedirectStandardOutput = redirectOutput };
+            return base.RunPackageTest(agentPath, settings);
+        }
+        else // must be "net8.0"
+        {
+            var agentPath = _agentBaseDirectory.CombineWithFilePath("net8.0/nunit-agent-net80.dll");
+            var dotnetExe = (isX86 ? Dotnet.X86Executable : Dotnet.Executable) ?? "dotnet";
+            var settings = new ProcessSettings() { Arguments = $"\"{agentPath}\" {arguments}", RedirectStandardOutput = redirectOutput };
+            return base.RunPackageTest(dotnetExe, settings);
+        }
+    }
+}
