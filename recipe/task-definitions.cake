@@ -121,6 +121,7 @@ BuildTasks.CreateProductionReleaseTask = Task("CreateProductionRelease")
 
 BuildTasks.ContinuousIntegrationTask = Task("ContinuousIntegration")
 	.Description("Perform continuous integration run")
+	.IsDependentOn("DumpSettings")
 	.IsDependentOn("Build")
 	.IsDependentOn("Test")
 	.IsDependentOn("Package")

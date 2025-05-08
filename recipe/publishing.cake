@@ -22,7 +22,6 @@ public static class PackageReleaseManager
 			bool publishToMyGet = BuildSettings.ShouldPublishToMyGet;
 			bool publishToNuGet = BuildSettings.ShouldPublishToNuGet && packageType == PackageType.NuGet;
 			bool publishToChocolatey = BuildSettings.ShouldPublishToChocolatey && packageType == PackageType.Chocolatey;
-			// TODO: If we decide to keep the zip build, add publishToZip here and handle it below
 
             // If --nopush was specified, give a detailed message showing what would have been pushed
             if (CommandLineOptions.NoPush)
