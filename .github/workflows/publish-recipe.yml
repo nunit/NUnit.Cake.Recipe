@@ -16,6 +16,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
+        fetch-tags: false
 
     - name: 🛠️ Setup .NET
       uses: actions/setup-dotnet@v4
