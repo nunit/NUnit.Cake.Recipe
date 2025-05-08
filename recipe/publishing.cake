@@ -41,7 +41,7 @@ public static class PackageReleaseManager
 
             try
             {
-                ApplyReleaseTagToBuild(BuildSettings.PackageVersion);
+                //ApplyReleaseTagToBuild(BuildSettings.PackageVersion);
 
 				if (publishToMyGet)
 					if (packageType == PackageType.NuGet)
@@ -66,36 +66,36 @@ public static class PackageReleaseManager
 			throw new Exception("One of the publishing steps failed.");
 	}
 
-	public static void ApplyReleaseTagToBuild(string releaseTag)
-	{
-		_context.Information($"Applying release tag {releaseTag}...");
+	//public static void ApplyReleaseTagToBuild(string releaseTag)
+	//{
+	//	_context.Information($"Applying release tag {releaseTag}...");
 
-		string currentTag = _context.GitDescribe(BuildSettings.ProjectDirectory, GitDescribeStrategy.Tags);
-		if (currentTag == releaseTag)
-		{
-			_context.Warning("  Tag already set on HEAD, possibly in a prior run.");
-			return;
-		}
+	//	string currentTag = _context.GitDescribe(BuildSettings.ProjectDirectory, GitDescribeStrategy.Tags);
+	//	if (currentTag == releaseTag)
+	//	{
+	//		_context.Warning("  Tag already set on HEAD, possibly in a prior run.");
+	//		return;
+	//	}
 
-		try
-		{
-            _context.GitTag(BuildSettings.ProjectDirectory, releaseTag);
-            _context.Information($"  Release tagged as {releaseTag}.");
+	//	try
+	//	{
+ //           _context.GitTag(BuildSettings.ProjectDirectory, releaseTag);
+ //           _context.Information($"  Release tagged as {releaseTag}.");
 
-			if (releaseTag.Contains("-alpha."))
-			{
-				_context.GitPushRef(BuildSettings.ProjectDirectory, BuildSettings.GitHubOwner, BuildSettings.GitHubAccessToken, "origin", releaseTag);
-				_context.Information($"  Release tag {releaseTag} was pushed to origin.");
-			}
-        }
-        catch (Exception ex)
-		{
-			if (!ex.Message.ToLower().Contains("tag already exists"))
-				throw;
+	//		if (releaseTag.Contains("-alpha."))
+	//		{
+	//			_context.GitPushRef(BuildSettings.ProjectDirectory, BuildSettings.GitHubOwner, BuildSettings.GitHubAccessToken, "origin", releaseTag);
+	//			_context.Information($"  Release tag {releaseTag} was pushed to origin.");
+	//		}
+ //       }
+ //       catch (Exception ex)
+	//	{
+	//		if (!ex.Message.ToLower().Contains("tag already exists"))
+	//			throw;
 
-			throw new Exception($"The {releaseTag} tag was used on an earlier commit. If no packages have been published, you may be able to remove that tag. Otherwise, you should advance the release version before proceeding.", ex);
-		}
-	}
+	//		throw new Exception($"The {releaseTag} tag was used on an earlier commit. If no packages have been published, you may be able to remove that tag. Otherwise, you should advance the release version before proceeding.", ex);
+	//	}
+	//}
 
     /// <summary>
     /// Re-publish a symbol package after a failure. Must specify --where
