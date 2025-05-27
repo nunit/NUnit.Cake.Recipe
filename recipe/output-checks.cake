@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////
-// SYNTAX FOR EXPRESSING A STRING CONSTRAINT
+// STATIC SYNTAX FOR EXPRESSING OUTPUT CHECKS
 //////////////////////////////////////////////////////////////////////
 
 //public static class StringConstraints
@@ -22,6 +22,11 @@
 //	}
 //}
 
+public static OutputContainsCheck Contains(string expectedText, int atleast = 1, int exactly = -1)
+    => new OutputContainsCheck(expectedText, atleast, exactly);
+
+public static OutputDoesNotContain DoesNotContain(string text) => new OutputDoesNotContain(text);
+
 // OutputCheck is used to check content of redirected package test output
 public abstract class OutputCheck
 {
@@ -43,9 +48,9 @@ public abstract class OutputCheck
 	public string Message { get; protected set; }
 }
 
-public class OutputContains : OutputCheck
+public class OutputContainsCheck : OutputCheck
 {
-    public OutputContains(string expectedText, int atleast = 1, int exactly = -1) : base(expectedText, atleast, exactly) { }
+    public OutputContainsCheck(string expectedText, int atleast = 1, int exactly = -1) : base(expectedText, atleast, exactly) { }
 
     public override bool Matches(string output)
     {

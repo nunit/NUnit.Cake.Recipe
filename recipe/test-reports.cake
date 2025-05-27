@@ -13,7 +13,7 @@ public class PackageTestReport
 		Runner = runner;
 
 		var expectedResult = test.ExpectedResult;
-		var expectedOutput = test.OutputCheck;
+		var expectedOutput = test.ExpectedOutput;
 
 		if (expectedResult != null)
 		{
@@ -57,10 +57,17 @@ public class PackageTestReport
 		}
 
 		if (expectedOutput != null)
-        {
-            if (!expectedOutput.Matches(runner.Output))
-                Errors.Add(expectedOutput.Message);
-        }
+		{
+			var output = runner.Output;
+			if (output is not null)
+				foreach (var outputCheck in expectedOutput)
+				{
+					if (!outputCheck.Matches(output))
+						Errors.Add(outputCheck.Message);
+				}
+			else
+				Errors.Add("No output was produced");
+		}
     }
 
 	public PackageTestReport(PackageTest test, int rc, IPackageTestRunner runner = null)
@@ -71,11 +78,12 @@ public class PackageTestReport
 
 		if (rc != test.ExpectedReturnCode)
 			Errors.Add($"   Expected: rc = {test.ExpectedReturnCode} But was: {rc}");
-		else if (test.OutputCheck != null)
-		{
-			if (!test.OutputCheck.Matches(runner.Output))
-				Errors.Add(test.OutputCheck.Message);
-		}
+		else if (test.ExpectedOutput != null)
+            foreach (var outputCheck in test.ExpectedOutput)
+            {
+                if (!outputCheck.Matches(runner.Output))
+				Errors.Add(outputCheck.Message);
+			}
 	}
 
 	public PackageTestReport(PackageTest test, Exception ex, IPackageTestRunner runner = null)

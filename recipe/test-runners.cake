@@ -21,7 +21,7 @@ public interface IPackageTestRunner
     string PackageId { get; }
     string Version { get; }
 
-    IEnumerable<string> Output { get; }
+    string Output { get; }
 
     int RunPackageTest(string arguments, bool redirectOutput = false);
 }
@@ -44,7 +44,7 @@ public abstract class TestRunner
 	public string PackageId { get; protected set; }
 	public string Version { get; protected set; }
 
-	public IEnumerable<string> Output { get; protected set; }
+	public string Output { get; private set; }
 
     protected int RunPackageTest(FilePath executablePath, string arguments = null, bool redirectOutput = false)
     {
@@ -90,14 +90,14 @@ public abstract class TestRunner
 		IEnumerable<string> output;
 		// If Redirected Output was not requested, output will be null
 		int rc = Context.StartProcess(executablePath, processSettings, out output);
-		Output = output;
+		Output = output != null ? string.Join("\r\n", output) : null;
 		return rc;
     }
 
 	internal string OutputHandler(string output)
 	{
 		// Ensure that package test output displays and is also re-directed.
-		// If the derive class doesn't need the output, it doesn't retrieve it.
+		// If the derived class doesn't need the output, it doesn't retrieve it.
 		Console.WriteLine(output);
 		return output;
 	}

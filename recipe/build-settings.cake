@@ -230,7 +230,7 @@ public static class BuildSettings
 				FileName = "build-results/NUnitConsole.binlog",
 				Imports = MSBuildBinaryLoggerImports.Embed
 			}
-		}.WithProperty("Version", BuildSettings.PackageVersion)
+		}.WithProperty("Version", PackageVersion)
 	};
 
 	// File Header Checks
