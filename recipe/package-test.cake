@@ -14,7 +14,7 @@ public class PackageTest
     public string Arguments { get; set; }
     public int ExpectedReturnCode { get; set; } = 0;
     public ExpectedResult ExpectedResult { get; set; }
-    public OutputCheck OutputCheck { get; set; }
+    public OutputCheck[] ExpectedOutput { get; set; }
     public ExtensionSpecifier[] ExtensionsNeeded { get; set; } = new ExtensionSpecifier[0];
     public IPackageTestRunner[] TestRunners { get; set; } = new IPackageTestRunner[0];
 

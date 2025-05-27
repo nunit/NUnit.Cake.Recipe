@@ -1,22 +1,6 @@
 //////////////////////////////////////////////////////////////////////
-// SYNTAX FOR EXPRESSING CHECKS
+// STATIC SYNTAX FOR EXPRESSING PACKAGE CHECKS
 //////////////////////////////////////////////////////////////////////
-
-public static class Check
-{
-	public static void That(DirectoryPath testDirPath, IList<PackageCheck> checks)
-	{
-		if (checks == null)
-			throw new ArgumentNullException(nameof(checks));
-
-		bool allOK = true;
-
-		foreach (var check in checks)
-			allOK &= check.ApplyTo(testDirPath);
-
-        if (!allOK) throw new Exception("Verification failed!");
-    }
-}
 
 public static FileCheck HasFile(FilePath file) => HasFiles(new[] { file });
 public static FileCheck HasFiles(params FilePath[] files) => new FileCheck(files);

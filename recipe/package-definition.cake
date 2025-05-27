@@ -242,7 +242,7 @@ public abstract class PackageDefinition
                 string arguments = $"{packageTest.Arguments} {ExtraTestArguments} --work={testResultDir}";
                 if (CommandLineOptions.TraceLevel.Value != "Off")
                     arguments += $" --trace:{CommandLineOptions.TraceLevel.Value}";
-                bool redirectOutput = packageTest.OutputCheck != null;
+                bool redirectOutput = packageTest.ExpectedOutput != null;
 
                 int rc = runner.RunPackageTest(arguments, redirectOutput);
 
