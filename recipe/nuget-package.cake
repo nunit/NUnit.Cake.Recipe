@@ -99,4 +99,12 @@ public class NuGetPackage : PackageDefinition
         else
             throw new Exception("Verification failed!");
     }
+
+    protected override bool IsRemovableExtension(string id)
+    {
+        return
+            id.StartsWith("NUnit.Extension.") &&
+            !id.StartsWith(PackageId) &&
+            !id.Contains("PluggableAgent");
+    }
 }

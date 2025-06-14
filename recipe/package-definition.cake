@@ -210,7 +210,15 @@ public abstract class PackageDefinition
         // Ensure we start out each package with no extensions installed.
         // If any package test installs an extension, it remains available
         // for subsequent tests of the same package only.
-        RemoveExtensions();
+        foreach (DirectoryPath dirPath in _context.GetDirectories(ExtensionInstallDirectory + "*"))
+        {
+            string dirName = dirPath.Segments.Last();
+            if (IsRemovableExtension(dirName))
+            {
+                _context.DeleteDirectory(dirPath, new DeleteDirectorySettings() { Recursive = true });
+                _context.Information("Deleted directory " + dirPath.GetDirectoryName());
+            }
+        }
 
         // Package was defined with one or more TestRunners. These
         // may or may not require installation.
@@ -297,20 +305,7 @@ public abstract class PackageDefinition
             extension.InstallExtension(this);
     }
 
-    // Remove all extensions prior to starting a run. Note that we avoid removing the the
-    // package being developed, which may actually be an extension itself.
-    protected void RemoveExtensions()
-    {
-        foreach (DirectoryPath dirPath in _context.GetDirectories(ExtensionInstallDirectory + "*"))
-        {
-            string dirName = dirPath.Segments.Last();
-            if ((dirName.StartsWith("NUnit.Extension.") || dirName.StartsWith("nunit-extension-")) && !dirName.StartsWith(PackageId))
-            {
-                _context.DeleteDirectory(dirPath, new DeleteDirectorySettings() { Recursive = true });
-                _context.Information("Deleted directory " + dirPath.GetDirectoryName());
-            }
-        }
-    }
+    protected abstract bool IsRemovableExtension(string dirName);
 
     private void InstallRunners(IEnumerable<IPackageTestRunner> runners)
     {

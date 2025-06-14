@@ -41,4 +41,12 @@ public class ChocolateyPackage : PackageDefinition
                 ArgumentCustomization = args => args.Append($"BIN_DIR={BuildSettings.OutputDirectory}")
             });
     }
+
+    protected override bool IsRemovableExtension(string id)
+    {
+        return
+            id.StartsWith("nunit-extension-") &&
+            !id.StartsWith(PackageId) &&
+            !id.Contains("pluggable-agent");
+    }
 }
