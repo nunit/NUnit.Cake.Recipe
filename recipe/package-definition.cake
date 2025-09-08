@@ -233,10 +233,14 @@ public abstract class PackageDefinition
                 continue;
 
             InstallExtensions(packageTest.ExtensionsNeeded);
-            InstallRunners(packageTest.TestRunners);
 
             // Use runners from the test if provided, otherwise the default runners
-            var runners = packageTest.TestRunners.Length > 0 ? packageTest.TestRunners : defaultRunners;
+            var runners = packageTest.TestRunners is not null && packageTest.TestRunners.Length > 0
+                ? packageTest.TestRunners
+                : packageTest.TestRunner is not null
+                    ? [packageTest.TestRunner]
+                    : defaultRunners;
+            InstallRunners(runners);
 
             foreach (var runner in runners)
             {
@@ -246,7 +250,7 @@ public abstract class PackageDefinition
 
                 Banner.Display(packageTest.Description);
 
-			    _context.CreateDirectory(testResultDir);
+                _context.CreateDirectory(testResultDir);
                 string arguments = $"{packageTest.Arguments} {ExtraTestArguments} --work={testResultDir}";
                 if (CommandLineOptions.TraceLevel.Value != "Off")
                     arguments += $" --trace:{CommandLineOptions.TraceLevel.Value}";
@@ -255,7 +259,7 @@ public abstract class PackageDefinition
                 int rc = runner.RunPackageTest(arguments, redirectOutput);
 
                 var actualResult = packageTest.ExpectedResult != null ? new ActualResult(resultFile) : null;
- 
+
                 try
                 {
                     var report = new PackageTestReport(packageTest, actualResult, runner);
@@ -318,6 +322,9 @@ public abstract class PackageDefinition
     private void InstallRunner(InstallableTestRunner runner)
     {
         runner.Install(PackageInstallDirectory);
+
+        foreach (var dependency in runner.Dependencies)
+            dependency.InstallExtension(this);
 
         switch(PackageType)
         {

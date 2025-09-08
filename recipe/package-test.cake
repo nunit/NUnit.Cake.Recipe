@@ -10,13 +10,13 @@ public class PackageTest
     public string Name { get; private set; }
 
     public string Description { get; set; }
-    public TestRunner TestRunner { get; set; }
     public string Arguments { get; set; }
     public int ExpectedReturnCode { get; set; } = 0;
     public ExpectedResult ExpectedResult { get; set; }
     public OutputCheck[] ExpectedOutput { get; set; }
     public ExtensionSpecifier[] ExtensionsNeeded { get; set; } = new ExtensionSpecifier[0];
-    public IPackageTestRunner[] TestRunners { get; set; } = new IPackageTestRunner[0];
+    public IPackageTestRunner TestRunner { get; set; }
+    public IPackageTestRunner[] TestRunners { get; set; }
 
     public PackageTest(int level, string name)
     {
