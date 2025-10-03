@@ -33,14 +33,16 @@ public class ExpectedResult : TestResultSummary
 
 public class ExpectedAssemblyResult
 {
-	public ExpectedAssemblyResult(string name, string expectedRuntime = null)
-	{
-		AssemblyName = name;
-		Runtime = expectedRuntime;
-	}
+    public ExpectedAssemblyResult(string name, string expectedRuntime = null, string expectedAgent = null)
+    {
+        AssemblyName = name;
+        Runtime = expectedRuntime;
+        AgentName = expectedAgent;
+    }
 
-	public string AssemblyName { get; }
-	public string Runtime { get; }
+    public string AssemblyName { get; }
+    public string Runtime { get; }
+    public string AgentName { get; }
 }
 
 public class ActualResult : TestResultSummary

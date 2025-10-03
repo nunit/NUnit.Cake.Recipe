@@ -40,7 +40,8 @@ public abstract class PackageDefinition
 
         PackageType = packageType;
         PackageId = id;
-        PackageVersion = BuildSettings.PackageVersion;
+        // HACK
+        PackageVersion = packageType == PackageType.Chocolatey ? BuildSettings.ChocolateyPackageVersion : BuildSettings.PackageVersion;
         PackageSource = source;
         BasePath = basePath ?? BuildSettings.OutputDirectory;
         TestRunner = testRunner;
