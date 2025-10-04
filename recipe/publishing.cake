@@ -15,7 +15,7 @@ public static class PackageReleaseManager
 
 		foreach (var package in BuildSettings.SelectedPackages)
 		{
-			var packageName = $"{package.PackageId}.{BuildSettings.PackageVersion}.nupkg";
+			var packageName = $"{package.PackageId}.{package.PackageVersion}.nupkg";
             var packagePath = BuildSettings.PackageDirectory + packageName;
 			var packageType = package.PackageType;
 
@@ -35,7 +35,7 @@ public static class PackageReleaseManager
                     whereToPublish.Add("Chocolatey");
 
 				string destinations = string.Join(", ", whereToPublish);
-                _context.Information($"NoPush option skipping publication of {package.PackageId} to {destinations}");
+                _context.Information($"NoPush option skipping publication of {packageName} to {destinations}");
                 continue;
             }
 
