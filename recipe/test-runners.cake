@@ -114,8 +114,6 @@ public abstract class InstallableTestRunner : TestRunner
 		Version = version;
 	}
 
-	//private bool IsChocolateyPackage => PackageId.Contains('-'); // Hack!
-
 	protected FilePath ExecutableRelativePath { get; set; }
 	protected bool IsDotNetTool { get; set; } = false;
 

@@ -57,6 +57,9 @@ public class ActualResult : TestResultSummary
 			throw new Exception("Top-level <test-run> or <test-suite> element not found.");
 
 		OverallResult = GetAttribute(Xml, "result");
+		var label = GetAttribute(Xml, "label");
+		if (label != null)
+			OverallResult += ":" + label;
 		Total = IntAttribute(Xml, "total");
 		Passed = IntAttribute(Xml, "passed");
 		Failed = IntAttribute(Xml, "failed");
@@ -66,7 +69,7 @@ public class ActualResult : TestResultSummary
 
 		var assemblies = new List<ActualAssemblyResult>();
 
-		foreach (XmlNode node in Xml.SelectNodes("//test-suite[@type='Assembly']"))
+		foreach (XmlNode node in Xml.SelectNodes("//test-suite[@type='Assembly'] | //test-suite[@type='Unknown']"))
 			assemblies.Add(new ActualAssemblyResult(node));
 
 		Assemblies = assemblies.ToArray();
