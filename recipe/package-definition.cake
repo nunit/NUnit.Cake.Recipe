@@ -163,6 +163,19 @@ public abstract class PackageDefinition
 
     public abstract void BuildPackage();
 
+    // This may be called by NuGet or Chocolatey packages
+    public void AddPackageToLocalFeed()
+    {
+        try
+        {
+            _context.NuGetAdd(PackageFilePath, BuildSettings.LocalPackagesDirectory);
+        }
+        catch (Exception ex)
+        {
+            _context.Error(ex.Message);
+        }
+    }
+
     // Base implementation is used for installing both NuGet and
     // Chocolatey packages. Other package types should override.
     public virtual void InstallPackage()

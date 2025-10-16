@@ -85,6 +85,8 @@ public static class BuildSettings
 			Context.Warning($"  SolutionFile: '{SolutionFile}'");
 		Context.Information($"  PackageTestLevel: {PackageTestLevel}");
 
+		LocalPackagesDirectory = FindLocalPackagesDirectory() ?? ProjectDirectory + "LOCAL_PACKAGES_DIR";
+
 		// Keep this last
 		if (IsRunningOnAppVeyor)
 		{
@@ -107,7 +109,19 @@ public static class BuildSettings
 		return null;
 	}
 
-	private static int CalcPackageTestLevel()
+	private static string FindLocalPackagesDirectory()
+	{
+		for (var dir = new DirectoryInfo(ProjectDirectory); dir != null; dir = dir.Parent)
+		{
+			string candidate = SIO.Path.Combine(dir.FullName, "LocalPackages");
+            if (SIO.Directory.Exists(candidate))
+				return candidate;
+		}
+
+		return null;
+    }
+
+    private static int CalcPackageTestLevel()
 	{
 		if (!BuildVersion.IsPreRelease)
 			return 3;
@@ -238,9 +252,10 @@ public static class BuildSettings
 	public static string ZipImageDirectory => ProjectDirectory + ZIP_IMG_DIR;
 	public static string ExtensionsDirectory => ProjectDirectory + "bundled-extensions/";
 	public static string ToolsDirectory => ProjectDirectory + TOOLS_DIR;
+    public static string LocalPackagesDirectory { get; private set; }
 
-	// Files
-	public static string SolutionFile { get; set; }
+    // Files
+    public static string SolutionFile { get; set; }
 
 	// Building
 	public static string[] ValidConfigurations { get; set; }
@@ -325,7 +340,10 @@ public static class BuildSettings
 		!IsPreRelease || LABELS_WE_PUBLISH_ON_CHOCOLATEY.Contains(BuildVersion.PreReleaseLabel) && !IsFractionalPreRelease;
 	public static bool ShouldPublishToGitHub =>
 		!IsPreRelease || LABELS_WE_PUBLISH_ON_GITHUB.Contains(BuildVersion.PreReleaseLabel) && !IsFractionalPreRelease;
-	public static bool IsFractionalPreRelease
+	public static bool ShouldPublishToLocalFeed =>
+		!IsPreRelease || LABELS_WE_ADD_TO_LOCAL_FEED.Contains(BuildVersion.PreReleaseLabel);
+
+    public static bool IsFractionalPreRelease
 	{
 		get
         {
@@ -395,6 +413,7 @@ public static class BuildSettings
 		Console.WriteLine("ZipResult:     " + ZipResultDirectory);
 		Console.WriteLine("Image:         " + ImageDirectory);
 		Console.WriteLine("ZipImage:      " + ZipImageDirectory);
+		Console.WriteLine("LocalPackages: " + LocalPackagesDirectory);
 
 		Console.WriteLine("\nBUILD");
 		Console.WriteLine("Configuration:   " + Configuration);
@@ -430,6 +449,7 @@ public static class BuildSettings
 		Console.WriteLine("ShouldPublishToMyGet:      " + ShouldPublishToMyGet);
 		Console.WriteLine("ShouldPublishToNuGet:      " + ShouldPublishToNuGet);
 		Console.WriteLine("ShouldPublishToChocolatey: " + ShouldPublishToChocolatey);
+		Console.WriteLine("ShouldPublishToLocalFeed:  " + ShouldPublishToLocalFeed);
 
 		Console.WriteLine("\nRELEASING");
 		Console.WriteLine("BranchName:                " + BranchName);

@@ -107,6 +107,26 @@ BuildTasks.PublishTask = Task("Publish")
             Information("Nothing to publish from this run.");
     });
 
+BuildTasks.PublishToLocalFeedTask = Task("PublishToLocalFeed")
+    .Description("""
+	Publishes packages to the local feed for a dev, alpha, beta, or rc build
+	or for a final release. If not, or if the --nopush option was used,
+	a message is displayed.
+	""")
+	.WithCriteria(() => BuildSettings.IsLocalBuild)
+    .Does(() => {
+		if (!BuildSettings.ShouldPublishToLocalFeed)
+			Information("Nothing to add to local feed from this run.");
+		else if (CommandLineOptions.NoPush)
+			Information("NoPush option suppressing publication to local feed");
+		else if (!SIO.Directory.Exists(BuildSettings.LocalPackagesDirectory))
+			throw new Exception("Local packages directory not found");
+		else
+			foreach (var package in BuildSettings.Packages)
+				if (package.PackageType == PackageType.NuGet || package.PackageType == PackageType.Chocolatey)
+					package.AddPackageToLocalFeed();
+    });
+
 BuildTasks.PublishSymbolsPackageTask = Task("PublishSymbolsPackage")
 	.Description("\"Re-publish a specific symbols package to NuGet after a failure\"")
 	.Does(() => PackageReleaseManager.PublishSymbolsPackage());

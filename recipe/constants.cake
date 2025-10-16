@@ -34,6 +34,7 @@ const string ZIP_RSLT_DIR		= "package/results/zip/";
 const string IMAGE_DIR          = "package/images";
 const string ZIP_IMG_DIR		= "package/images/zip/";
 const string TOOLS_DIR			= "tools/";
+const string LOCAL_PACKAGES_DIR = "../LocalPackages";
 
 // URLs for uploading packages
 private const string MYGET_PUSH_URL = "https://www.myget.org/F/nunit/api/v2";
@@ -53,3 +54,4 @@ private static readonly string[] LABELS_WE_PUBLISH_ON_NUGET = { "beta", "rc" };
 private static readonly string[] LABELS_WE_PUBLISH_ON_CHOCOLATEY = { "beta", "rc" };
 private static readonly string[] LABELS_WE_PUBLISH_ON_GITHUB = { "beta", "rc" };
 private static readonly string[] LABELS_USED_AS_TAGS = { "alpha", "beta", "rc" };
+private static readonly string[] LABELS_WE_ADD_TO_LOCAL_FEED = { "dev", "alpha", "beta", "rc" };
