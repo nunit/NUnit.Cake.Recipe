@@ -41,7 +41,7 @@ public static class PackageReleaseManager
 
             try
             {
-                //ApplyReleaseTagToBuild(BuildSettings.PackageVersion);
+                //ApplyReleaseTagToBuild(PackageVersion);
 
 				if (publishToMyGet)
 					if (packageType == PackageType.NuGet)
@@ -110,7 +110,7 @@ public static class PackageReleaseManager
 		else
 		{
 			var package = GetSingleNuGetPackage();
-			var packageName = $"{package.PackageId}.{BuildSettings.PackageVersion}.snupkg";
+			var packageName = $"{package.PackageId}.{package.PackageVersion}.snupkg";
 			var packagePath = BuildSettings.PackageDirectory + packageName;
 			_context.NuGetPush(packagePath, new NuGetPushSettings() { ApiKey = BuildSettings.NuGetApiKey, Source = BuildSettings.NuGetPushUrl });
 		}

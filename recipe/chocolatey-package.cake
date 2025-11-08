@@ -3,6 +3,7 @@ public class ChocolateyPackage : PackageDefinition
     public ChocolateyPackage(
         string id, 
         string source, 
+        string packageVersion = null,
         IPackageTestRunner testRunner = null, 
         IPackageTestRunner[] testRunners = null,
         PackageCheck[] checks = null, 
@@ -11,6 +12,7 @@ public class ChocolateyPackage : PackageDefinition
         PackageType.Chocolatey,
         id, 
         source, 
+        packageVersion: packageVersion,
         testRunner: testRunner, 
         testRunners: testRunners,
         checks: checks, 

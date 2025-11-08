@@ -386,7 +386,7 @@ public static class BuildSettings
 		Console.WriteLine("IsRunningOnAppVeyor:          " + IsRunningOnAppVeyor);
 		Console.WriteLine("IsRunningOnGitHubActions:     " + IsRunningOnGitHubActions);
 
-		Console.WriteLine("\nVERSIONING");
+		Console.WriteLine("\nVERSIONING DEFAULTS");
 		Console.WriteLine("PackageVersion:               " + PackageVersion);
 		Console.WriteLine("AssemblyVersion:              " + AssemblyVersion);
 		Console.WriteLine("AssemblyFileVersion:          " + AssemblyFileVersion);
@@ -437,6 +437,7 @@ public static class BuildSettings
 		{
 			Console.WriteLine(package.PackageId);
 			Console.WriteLine("  PackageType:               " + package.PackageType);
+			Console.WriteLine("  PackageVersion:            " + package.PackageVersion);
 			Console.WriteLine("  PackageFileName:           " + package.PackageFileName);
 			Console.WriteLine("  PackageInstallDirectory:   " + package.PackageInstallDirectory);
             Console.WriteLine("  PackageTestDirectory:      " + package.PackageTestDirectory);

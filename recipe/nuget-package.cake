@@ -3,6 +3,7 @@ public class NuGetPackage : PackageDefinition
     public NuGetPackage(
         string id, 
         string source, 
+        string packageVersion = null,
         string basePath = null,
         IPackageTestRunner testRunner = null,
         IPackageTestRunner[] testRunners = null,
@@ -13,6 +14,7 @@ public class NuGetPackage : PackageDefinition
         PackageType.NuGet, 
         id, 
         source, 
+        packageVersion: packageVersion,
         basePath: basePath,
         testRunner: testRunner, 
         testRunners: testRunners,
@@ -69,7 +71,7 @@ public class NuGetPackage : PackageDefinition
                     Configuration = BuildSettings.Configuration,
                     PlatformTarget = PlatformTarget.MSIL,
                     //AllowPreviewVersion = BuildSettings.MSBuildAllowPreviewVersion
-                }.WithProperty("Version", BuildSettings.PackageVersion));
+                }.WithProperty("Version", PackageVersion));
         else
             throw new ArgumentException(
                 $"Invalid package source specified: {PackageSource}", "source");

@@ -11,11 +11,13 @@ public class RecipePackage : NuGetPackage
 	public RecipePackage(
         string id,
         string source,
+        string packageVersion = null,
         string content = "recipe/*.cake",
         PackageCheck[] checks = null )
     : base (
         id, 
         source: source,
+        packageVersion: packageVersion,
         basePath: BuildSettings.ProjectDirectory,
         checks: checks )
     {

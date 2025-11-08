@@ -23,6 +23,7 @@ public abstract class PackageDefinition
         PackageType packageType,
         string id,
         string source,
+        string packageVersion = null,
         string basePath = null, // Defaults to OutputDirectory
         IPackageTestRunner testRunner = null,
         IPackageTestRunner[] testRunners = null,
@@ -40,9 +41,7 @@ public abstract class PackageDefinition
 
         PackageType = packageType;
         PackageId = id;
-        // HACK
-        //PackageVersion = packageType == PackageType.Chocolatey ? BuildSettings.ChocolateyPackageVersion : BuildSettings.PackageVersion;
-        PackageVersion = BuildSettings.PackageVersion;
+        PackageVersion = packageVersion ?? BuildSettings.PackageVersion;
         PackageSource = source;
         BasePath = basePath ?? BuildSettings.OutputDirectory;
         TestRunner = testRunner;
@@ -188,7 +187,8 @@ public abstract class PackageDefinition
                 BuildSettings.PackageDirectory,
                 // Dependencies may be in any of these
 			    "https://www.myget.org/F/nunit/api/v3/index.json",
-			    "https://api.nuget.org/v3/index.json" },
+			    "https://api.nuget.org/v3/index.json",
+                BuildSettings.LocalPackagesDirectory },
             Version = PackageVersion,
             OutputDirectory = PackageInstallDirectory,
             //ExcludeVersion = true,

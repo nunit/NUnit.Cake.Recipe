@@ -3,6 +3,7 @@ public class ZipPackage : PackageDefinition
     public ZipPackage(
         string id, 
         string source, 
+        string packageVersion = null,
         IPackageTestRunner testRunner = null,
         IPackageTestRunner[] testRunners = null,
         PackageCheck[] checks = null, 
@@ -12,6 +13,7 @@ public class ZipPackage : PackageDefinition
         PackageType.Zip, 
         id, 
         source, 
+        packageVersion: packageVersion,
         testRunner: testRunner,
         testRunners: testRunners,
         checks: checks, 
