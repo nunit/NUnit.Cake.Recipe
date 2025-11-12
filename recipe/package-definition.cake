@@ -22,15 +22,21 @@ public abstract class PackageDefinition
 	protected PackageDefinition(
         PackageType packageType,
         string id,
-        string source,
+        string source = null,
         string packageVersion = null,
         string basePath = null, // Defaults to OutputDirectory
+        string title = null,
+        string description = null,
+        string summary = null,
+        string[] releaseNotes = null,
+        string[] tags = null,
         IPackageTestRunner testRunner = null,
         IPackageTestRunner[] testRunners = null,
         string extraTestArguments = null,
-        PackageCheck[] checks = null,
-        PackageCheck[] symbols = null,
-        IEnumerable<PackageTest> tests = null)
+        IEnumerable<PackageCheck> checks = null,
+        IEnumerable<PackageCheck> symbols = null,
+        IEnumerable<PackageTest> tests = null,
+        PackageContent packageContent = null )
     {
         if (testRunner == null && testRunners == null && tests != null)
             throw new System.InvalidOperationException($"Unable to create {packageType} package {id}: TestRunner or TestRunners must be provided if there are tests.");
@@ -44,12 +50,18 @@ public abstract class PackageDefinition
         PackageVersion = packageVersion ?? BuildSettings.PackageVersion;
         PackageSource = source;
         BasePath = basePath ?? BuildSettings.OutputDirectory;
+        PackageTitle = title ?? id;
+        PackageDescription = description ?? summary;
+        PackageSummary = summary ?? description;
+        ReleaseNotes = releaseNotes;
+        Tags = tags ?? new[] { "testcentric" };
         TestRunner = testRunner;
         TestRunners = testRunners;
         ExtraTestArguments = extraTestArguments;
         PackageChecks = checks;
         SymbolChecks = symbols;
         PackageTests = tests;
+        PackageContent = packageContent ?? new PackageContent();
     }
 
     public PackageType PackageType { get; }
@@ -57,20 +69,25 @@ public abstract class PackageDefinition
     public string PackageVersion { get; protected set; }
 	public string PackageSource { get; }
     public string BasePath { get; }
+    public IPackageTestRunner TestRunner { get; }
+    public IPackageTestRunner[] TestRunners { get; }
+    public string PackageTitle { get; }
+    public string PackageSummary { get; }
+    public string PackageDescription { get; }
+    public string[] ReleaseNotes { get; }
+    public string[] Tags { get; }
+    public string ExtraTestArguments { get; }
+    public IEnumerable<PackageCheck> PackageChecks { get; }
+    public IEnumerable<PackageCheck> SymbolChecks { get; protected set; }
+    public IEnumerable<PackageTest> PackageTests { get; }
+    public PackageContent PackageContent { get; }
+
+    public bool HasSymbols { get; protected set; } = false;
+    public virtual string SymbolPackageName => throw new System.NotImplementedException($"Symbols are not available for {PackageType} packages.");
 
     // Defaults to null unless the package sets it.
     public PackageReference[] BundledExtensions { get; protected set; } = null;
     public bool HasBundledExtensions => BundledExtensions != null;
-
-    public IPackageTestRunner TestRunner { get; }
-    public IPackageTestRunner[] TestRunners { get; }
-    public string ExtraTestArguments { get; }
-    public PackageCheck[] PackageChecks { get; }
-    public PackageCheck[] SymbolChecks { get; protected set; }
-    public IEnumerable<PackageTest> PackageTests { get; }
-
-    public bool HasSymbols { get; protected set; } = false;
-    public virtual string SymbolPackageName => throw new System.NotImplementedException($"Symbols are not available for {PackageType} packages.");
 
     // The file name of this package, including extension
     public abstract string PackageFileName { get; }
@@ -134,7 +151,7 @@ public abstract class PackageDefinition
         Banner.Display($"Installing {PackageFileName}");
         InstallPackage();
 
-        if (PackageChecks != null)
+        if (PackageChecks != null || PackageContent != null)
         {
             Banner.Display($"Verifying {PackageFileName}");
             VerifyPackage();
@@ -204,9 +221,16 @@ public abstract class PackageDefinition
     {
         bool allOK = true;
 
+        if (PackageContent != null)
+            allOK &= PackageContent.VerifyInstallation(PackageTestDirectory);
+
         if (PackageChecks != null)
+        {
+            _context.Information("Package Checks");
+
             foreach (var check in PackageChecks)
                 allOK &= check.ApplyTo(PackageTestDirectory);
+        }
 
         if (allOK)
             Console.WriteLine("All checks passed!");

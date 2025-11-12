@@ -2,25 +2,36 @@ public class NuGetPackage : PackageDefinition
 {
     public NuGetPackage(
         string id, 
-        string source, 
+        string title = null,
+        string description = null,
+        string summary = null,
+        string[] releaseNotes = null,
+        string[] tags = null,
+        string source = null, 
         string packageVersion = null,
         string basePath = null,
         IPackageTestRunner testRunner = null,
         IPackageTestRunner[] testRunners = null,
         PackageCheck[] checks = null, 
         PackageCheck[] symbols = null, 
-        IEnumerable<PackageTest> tests = null)
+        IEnumerable<PackageTest> tests = null,
+        PackageContent packageContent = null)
     : base(
         PackageType.NuGet, 
-        id, 
-        source, 
+        id,
+        title: title,
+        description: description,
+        summary: summary,
+        releaseNotes: releaseNotes,
+        source: source, 
         packageVersion: packageVersion,
         basePath: basePath,
         testRunner: testRunner, 
         testRunners: testRunners,
         checks: checks, 
         symbols: symbols, 
-        tests: tests)
+        tests: tests,
+        packageContent: packageContent)
     {
         //if (!source.EndsWith(".nuspec"))
         //    throw new ArgumentException("Source must be a nuspec file", nameof(source));
@@ -43,21 +54,57 @@ public class NuGetPackage : PackageDefinition
     // The directory into which extensions to the test runner are installed
     public override string ExtensionInstallDirectory => BuildSettings.NuGetTestDirectory;
 
+    protected virtual NuGetPackSettings NuGetPackSettings
+    {
+        get
+        {
+            var repositoryUrl = NUNIT_GITHUB_URL + BuildSettings.GitHubRepository + "/";
+            var rawGitHubUserContent = "https://raw.githubusercontent.com/" + BuildSettings.GitHubRepository + "/main/";
+
+            var settings = new NuGetPackSettings()
+            {
+                // From PackageDefinition
+                Id = PackageId,
+                Version = PackageVersion,
+                Title = PackageTitle ?? PackageId,
+                Description = PackageDescription,
+                ReleaseNotes = ReleaseNotes,
+                Tags = Tags,
+                BasePath = BasePath,
+                // From BuildSettings
+                Verbosity = BuildSettings.NuGetVerbosity,
+                OutputDirectory = BuildSettings.PackageDirectory,
+                Repository = new NuGetRepository() { Type = "Git", Url = repositoryUrl },
+                Symbols = HasSymbols,
+                // Common to all packages
+                Authors = NUNIT_PACKAGE_AUTHORS,
+                Copyright = NUNIT_COPYRIGHT,
+                ProjectUrl = new Uri(NUNIT_PROJECT_URL),
+                License = NUNIT_LICENSE,
+                RequireLicenseAcceptance = false,
+                Icon = NUNIT_ICON,
+                Language = "en-US",
+                NoPackageAnalysis = true,
+            };
+
+            if (HasSymbols)
+                settings.SymbolPackageFormat = "snupkg";
+
+            if (PackageContent != null)
+            {
+                foreach (var item in PackageContent.GetNuSpecContent())
+                    settings.Files.Add(item);
+
+                foreach (PackageReference dependency in PackageContent.Dependencies)
+                    settings.Dependencies.Add(new NuSpecDependency { Id = dependency.Id, Version = dependency.Version });
+            }
+
+            return settings;
+        }
+    }
+
     public override void BuildPackage()
     {
-        var NuGetPackSettings = new NuGetPackSettings()
-        {
-            Version = PackageVersion,
-            BasePath = BasePath,
-            OutputDirectory = BuildSettings.PackageDirectory,
-            NoPackageAnalysis = true,
-            Symbols = HasSymbols,
-            Verbosity = BuildSettings.NuGetVerbosity
-        };
-
-        if (HasSymbols)
-            NuGetPackSettings.SymbolPackageFormat = "snupkg";
-
         if (string.IsNullOrEmpty(PackageSource))
             _context.NuGetPack(NuGetPackSettings);
         else if (PackageSource.EndsWith(".nuspec"))

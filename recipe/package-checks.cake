@@ -9,6 +9,7 @@ public static DirectoryCheck HasDirectory(string dirPathOrPattern) => new Direct
 
 public static DependencyCheck HasDependency(string packageId, string packageVersion = null) => new DependencyCheck(packageId, packageVersion);
 public static DependencyCheck HasDependency(PackageReference packageReference) => new DependencyCheck(packageReference);
+public static MultipleDependencies HasDependencies(IEnumerable<PackageReference> packageReferences) => new MultipleDependencies(packageReferences);
 
 //////////////////////////////////////////////////////////////////////
 // PACKAGECHECK CLASS
@@ -247,5 +248,28 @@ public class DependencyCheck : PackageCheck
                     return null;
             }
         }
+    }
+}
+
+//////////////////////////////////////////////////////////////////////
+// MULTIPLEDEPENDENCIES CLASS
+//////////////////////////////////////////////////////////////////////
+
+public class MultipleDependencies : PackageCheck
+{
+    private List<DependencyCheck> _dependencies = new List<DependencyCheck>();
+
+    public MultipleDependencies(IEnumerable<PackageReference> packageReferences)
+    {
+        foreach(var packageReference in packageReferences)
+            _dependencies.Add(new DependencyCheck(packageReference));
+    }
+
+    public override bool ApplyTo(DirectoryPath testDirPath)
+    {
+        bool isOK = true;
+        foreach (var dependency in _dependencies)
+            isOK &= dependency.ApplyTo(testDirPath);
+        return isOK;
     }
 }
