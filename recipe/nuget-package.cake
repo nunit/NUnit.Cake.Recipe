@@ -105,10 +105,14 @@ public class NuGetPackage : PackageDefinition
 
     public override void BuildPackage()
     {
+        Console.WriteLine($"Building package from {PackageSource}");
         if (string.IsNullOrEmpty(PackageSource))
             _context.NuGetPack(NuGetPackSettings);
         else if (PackageSource.EndsWith(".nuspec"))
+        {
+            Console.WriteLine("Building Package");
             _context.NuGetPack(PackageSource, NuGetPackSettings);
+        }
         else if (PackageSource.EndsWith(".csproj"))
             _context.MSBuild(PackageSource,
                 new MSBuildSettings

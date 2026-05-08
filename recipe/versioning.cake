@@ -8,7 +8,7 @@ public class BuildVersion
     // NOTE: This is complicated because (1) the user may have specified 
     // the package version on the command-line and (2) GitVersion may
     // or may not be available. We'll work on solving (2) by getting
-    // GitVersion to run for us on Linux, but (1) will alwas remain.
+    // GitVersion to run for us on Linux, but (1) will always remain.
     //
     // We simplify things a by figuring out the full package version and
     // then parsing it to provide information that is used in the build.
