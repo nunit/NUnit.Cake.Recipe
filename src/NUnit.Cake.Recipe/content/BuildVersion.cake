@@ -1,5 +1,3 @@
-using System.Text.RegularExpressions;
-
 public class BuildVersion
 {
     private ICakeContext _context;

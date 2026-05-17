@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<IncludeBuildOutput>false</IncludeBuildOutput>
+		<IsPackable>true</IsPackable>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<StartYear>2016</StartYear>
+		<EndYear>$([System.DateTime]::Today.Year)</EndYear>
+		<CopyrightYears Condition="'$(StartYear)'=='$(EndYear)'">$(StartYear)</CopyrightYears>
+		<CopyrightYears Condition="'$(StartYear)'!='$(EndYear)'">$(StartYear)-$(EndYear)</CopyrightYears>
+
+		<!-- Properties related to packaging -->
+		<NoWarn>$(NoWarn);NU5128</NoWarn>
+		<Title>NUnit Cake Recipe</Title>
+		<Authors>Charlie Poole</Authors>
+		<Copyright>Copyright (c) $(CopyrightYears) Charlie Poole</Copyright>
+		<Description>Cake Recipe used for building NUnit applications and extensions.</Description>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<PackageProjectUrl>https://nunit.org</PackageProjectUrl>
+		<RepositoryType>git</RepositoryType>
+		<RepositoryUrl>https://github.com/NUnit/NUnit.Cake.Recipe.git</RepositoryUrl>
+		<PackageIcon>nunit_256.png</PackageIcon>
+		<PackageIconUrl>https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.pngbui</PackageIconUrl>
+		<PackageTags>NUnit;Cake;Recipe</PackageTags>
+		<PackageReleaseNotes>https://github.com/NUnit/NUnit.Cake.Recipe/releases/tag/$(Version)</PackageReleaseNotes>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="content\*" Pack="true" PackagePath="/content" />
+		<None Include="LICENSE.txt" Pack="true" PackagePath="\" />
+		<None Include="README.md" Pack="true" PackagePath="\" />
+		<None Include="nunit_256.png" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Cake.BuildSystems.Module" Version="9.0.0" />
+		<PackageReference Include="Cake.Common" Version="6.1.0" />
+	</ItemGroup>
+	
+</Project>

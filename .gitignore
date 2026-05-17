@@ -6,6 +6,11 @@ packages
 
 # Visual Studio
 .vs
+obj
+bin
+
+# Build Results
+build-Results
 
 # Packaging Directory
 package

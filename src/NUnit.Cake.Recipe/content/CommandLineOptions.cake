@@ -1,12 +1,9 @@
-// ***********************************************************************
-// Copyright (c) Charlie Poole and TestCentric GUI contributors.
-// Licensed under the MIT License. See LICENSE.txt in root directory.
-// ***********************************************************************
-
 CommandLineOptions.Initialize(Context);
 
 public static class CommandLineOptions
 {
+    const string DEFAULT_CONFIGURATION = "Release";
+
     static private ICakeContext _context;
 
     static public ValueOption<string> Target;

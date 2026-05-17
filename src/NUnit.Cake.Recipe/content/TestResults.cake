@@ -1,8 +1,6 @@
 // This file contains classes used to interpret the result XML that is
 // produced by test runs of the GUI.
 
-using System.Xml;
-
 public abstract class TestResultSummary
 {
 	public string OverallResult { get; set; }

@@ -28,15 +28,3 @@ public class PackageTest
         Description = name;
     }
 }
-
-public class MultipleRunnerPackageTest : PackageTest
-{ 
-	public MultipleRunnerPackageTest(int level, string name, string description, string arguments, ExpectedResult expectedResult, params IPackageTestRunner[] testRunners )
-        : base(level, name)
-    {
-        Description = description;
-        Arguments = arguments;
-        ExpectedResult = expectedResult;
-		TestRunners = testRunners;
-    }
-}
