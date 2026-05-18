@@ -1,6 +1,56 @@
 public static class BuildSettings
 {
-	private static BuildSystem _buildSystem;
+    #region Constants and Other Standard Values
+
+    private static readonly string[] DEFAULT_VALID_CONFIGS = { "Release", "Debug" };
+    private static readonly string[] DEFAULT_STANDARD_HEADER = [
+		"// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt" ];
+
+    // Standardized project directory structure - not changeable by user
+    const string SRC_DIR = "src/";
+    const string BIN_DIR = "bin/";
+    const string NUGET_DIR = "nuget/";
+    const string CHOCO_DIR = "choco/";
+    const string ZIP_DIR = "zip/";
+    const string PACKAGE_DIR = "packages/";
+    const string PKG_TEST_DIR = "packages/tests/";
+    const string NUGET_TEST_DIR = "packages/tests/nuget/";
+    //const string NUGET_RUNNER_DIR	= "packages/tests/nuget/runners/";
+    const string CHOCO_TEST_DIR = "packages/tests/choco/";
+    //const string CHOCO_RUNNER_DIR	= "packages/tests/choco/runners/";
+    const string ZIP_TEST_DIR = "packages/tests/zip/";
+    const string PKG_RSLT_DIR = "packages/results/";
+    const string NUGET_RSLT_DIR = "packages/results/nuget/";
+    const string CHOCO_RSLT_DIR = "packages/results/choco/";
+    const string ZIP_RSLT_DIR = "packages/results/zip/";
+    const string IMAGE_DIR = "packages/images";
+    const string ZIP_IMG_DIR = "packages/images/zip/";
+    const string TOOLS_DIR = "tools/";
+    const string LOCAL_PACKAGES_DIR = "../LocalPackages";
+
+    // URLs for uploading packages
+    private const string MYGET_PUSH_URL = "https://www.myget.org/F/nunit/api/v2";
+    private const string NUGET_PUSH_URL = "https://api.nuget.org/v3/index.json";
+    private const string CHOCO_PUSH_URL = "https://push.chocolatey.org/";
+
+    // Environment Variable names holding API keys
+    private const string MYGET_API_KEY = "MYGET_API_KEY";
+    private const string NUGET_API_KEY = "NUGET_API_KEY";
+    private const string CHOCO_API_KEY = "CHOCO_API_KEY";
+    private const string GITHUB_ACCESS_TOKEN = "GITHUB_ACCESS_TOKEN";
+
+    // Pre-release labels that we publish
+    private static readonly string[] LABELS_WE_PUBLISH = { "dev", "alpha", "beta", "rc" };
+    private static readonly string[] LABELS_WE_PUBLISH_ON_MYGET = { "dev", "alpha", "beta", "rc" };
+    private static readonly string[] LABELS_WE_PUBLISH_ON_NUGET = { "beta", "rc" };
+    private static readonly string[] LABELS_WE_PUBLISH_ON_CHOCOLATEY = { "beta", "rc" };
+    private static readonly string[] LABELS_WE_PUBLISH_ON_GITHUB = { "beta", "rc" };
+    private static readonly string[] LABELS_USED_AS_TAGS = { "alpha", "beta", "rc" };
+    private static readonly string[] LABELS_WE_ADD_TO_LOCAL_FEED = { "dev", "alpha", "beta", "rc" };
+
+    #endregion
+
+    private static BuildSystem _buildSystem;
 
 	public static void Initialize(
 		// Required parameters
@@ -28,8 +78,7 @@ public static class BuildSettings
 		IUnitTestRunner unitTestRunner = null, // If not set, NUnitLite is used
 		string unitTestArguments = null,
 
-		string defaultTarget = null // Defaults to "Build"
-		)
+		string defaultTarget = null) // Defaults to "Build"
 	{
 		// Required arguments
 		Context = context ?? throw new ArgumentNullException(nameof(context));

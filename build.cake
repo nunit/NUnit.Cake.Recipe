@@ -1,6 +1,6 @@
 // We use some recipe files for testing. In addition, loading the
 // entire recipe gives us an error if any references are missing.
-#load recipe/*.cake
+#load src/NUnit.Cake.Recipe/content/*.cake
 
 //////////////////////////////////////////////////////////////////////
 // INITIALIZE BUILD SETTINGS
@@ -9,21 +9,20 @@
 BuildSettings.Initialize(
 	context: Context,
 	title: "NUnit Cake Recipe",
-	githubRepository: "NUnit.Cake.Recipe",
-	defaultTarget: "Package" );
+	githubRepository: "NUnit.Cake.Recipe");
 
 //////////////////////////////////////////////////////////////////////
 // DEFINE RECIPE PACKAGE
 //////////////////////////////////////////////////////////////////////
 
 BuildSettings.Packages.Add(
-	new RecipePackage
+	new NuGetPackage
 	(
 		id: "NUnit.Cake.Recipe",
-		source: "nuget/NUnit.Cake.Recipe.nuspec",
+		source: "src/NUnit.Cake.Recipe/NUnit.Cake.Recipe.csproj",
 		checks: new PackageCheck[] {
 			HasFiles("README.md", "LICENSE.txt", "nunit_256.png"),
-			HasDirectory("content").WithFiles(BuildSettings.Context.GetFiles("recipe/*.cake").Select(f => f.GetFilename()).ToArray())
+			HasDirectory("content").WithFiles(BuildSettings.Context.GetFiles("recipe/content/*").Select(f => f.GetFilename()).ToArray())
 		}
 	) );
 

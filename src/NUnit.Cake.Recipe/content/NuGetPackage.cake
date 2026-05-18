@@ -1,5 +1,7 @@
 public class NuGetPackage : PackageDefinition
 {
+    private const string NUNIT_GITHUB_URL = "https://github.com/nunit/";
+
     public NuGetPackage(
         string id, 
         string title = null,
@@ -118,7 +120,9 @@ public class NuGetPackage : PackageDefinition
                     Configuration = BuildSettings.Configuration,
                     PlatformTarget = PlatformTarget.MSIL,
                     //AllowPreviewVersion = BuildSettings.MSBuildAllowPreviewVersion
-                }.WithProperty("Version", PackageVersion));
+                }
+                .WithProperty("Version", PackageVersion)
+                .WithProperty("PackageOutputPath", BuildSettings.PackageDirectory));
         else
             throw new ArgumentException(
                 $"Invalid package source specified: {PackageSource}", "source");

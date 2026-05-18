@@ -1,5 +1,7 @@
 public class ChocolateyPackage : PackageDefinition
 {
+    private const string NUNIT_GITHUB_URL = "https://github.com/nunit/";
+
     public ChocolateyPackage(
         string id,
         string title = null,
