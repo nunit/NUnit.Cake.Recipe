@@ -1,56 +1,56 @@
 public static class BuildSettings
 {
-    #region Constants and Other Standard Values
+	#region Constants and Other Standard Values
 
-    private static readonly string[] DEFAULT_VALID_CONFIGS = { "Release", "Debug" };
-    private static readonly string[] DEFAULT_STANDARD_HEADER = [
+	private static readonly string[] DEFAULT_VALID_CONFIGS = { "Release", "Debug" };
+	private static readonly string[] DEFAULT_STANDARD_HEADER = [
 		"// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt" ];
 
-    // Standardized project directory structure - not changeable by user
-    const string SRC_DIR = "src/";
-    const string BIN_DIR = "bin/";
-    const string NUGET_DIR = "nuget/";
-    const string CHOCO_DIR = "choco/";
-    const string ZIP_DIR = "zip/";
-    const string PACKAGE_DIR = "packages/";
-    const string PKG_TEST_DIR = "packages/tests/";
-    const string NUGET_TEST_DIR = "packages/tests/nuget/";
-    //const string NUGET_RUNNER_DIR	= "packages/tests/nuget/runners/";
-    const string CHOCO_TEST_DIR = "packages/tests/choco/";
-    //const string CHOCO_RUNNER_DIR	= "packages/tests/choco/runners/";
-    const string ZIP_TEST_DIR = "packages/tests/zip/";
-    const string PKG_RSLT_DIR = "packages/results/";
-    const string NUGET_RSLT_DIR = "packages/results/nuget/";
-    const string CHOCO_RSLT_DIR = "packages/results/choco/";
-    const string ZIP_RSLT_DIR = "packages/results/zip/";
-    const string IMAGE_DIR = "packages/images";
-    const string ZIP_IMG_DIR = "packages/images/zip/";
-    const string TOOLS_DIR = "tools/";
-    const string LOCAL_PACKAGES_DIR = "../LocalPackages";
+	// Standardized project directory structure - not changeable by user
+	const string SRC_DIR = "src/";
+	const string BIN_DIR = "bin/";
+	const string NUGET_DIR = "nuget/";
+	const string CHOCO_DIR = "choco/";
+	const string ZIP_DIR = "zip/";
+	const string PACKAGE_DIR = "packages/";
+	const string PKG_TEST_DIR = "packages/tests/";
+	const string NUGET_TEST_DIR = "packages/tests/nuget/";
+	//const string NUGET_RUNNER_DIR	= "packages/tests/nuget/runners/";
+	const string CHOCO_TEST_DIR = "packages/tests/choco/";
+	//const string CHOCO_RUNNER_DIR	= "packages/tests/choco/runners/";
+	const string ZIP_TEST_DIR = "packages/tests/zip/";
+	const string PKG_RSLT_DIR = "packages/results/";
+	const string NUGET_RSLT_DIR = "packages/results/nuget/";
+	const string CHOCO_RSLT_DIR = "packages/results/choco/";
+	const string ZIP_RSLT_DIR = "packages/results/zip/";
+	const string IMAGE_DIR = "packages/images";
+	const string ZIP_IMG_DIR = "packages/images/zip/";
+	const string TOOLS_DIR = "tools/";
+	const string LOCAL_PACKAGES_DIR = "../LocalPackages";
 
-    // URLs for uploading packages
-    private const string MYGET_PUSH_URL = "https://www.myget.org/F/nunit/api/v2";
-    private const string NUGET_PUSH_URL = "https://api.nuget.org/v3/index.json";
-    private const string CHOCO_PUSH_URL = "https://push.chocolatey.org/";
+	// URLs for uploading packages
+	private const string MYGET_PUSH_URL = "https://www.myget.org/F/nunit/api/v2";
+	private const string NUGET_PUSH_URL = "https://api.nuget.org/v3/index.json";
+	private const string CHOCO_PUSH_URL = "https://push.chocolatey.org/";
 
-    // Environment Variable names holding API keys
-    private const string MYGET_API_KEY = "MYGET_API_KEY";
-    private const string NUGET_API_KEY = "NUGET_API_KEY";
-    private const string CHOCO_API_KEY = "CHOCO_API_KEY";
-    private const string GITHUB_ACCESS_TOKEN = "GITHUB_ACCESS_TOKEN";
+	// Environment Variable names holding API keys
+	private const string MYGET_API_KEY = "MYGET_API_KEY";
+	private const string NUGET_API_KEY = "NUGET_API_KEY";
+	private const string CHOCO_API_KEY = "CHOCO_API_KEY";
+	private const string GITHUB_ACCESS_TOKEN = "GITHUB_ACCESS_TOKEN";
 
-    // Pre-release labels that we publish
-    private static readonly string[] LABELS_WE_PUBLISH = { "dev", "alpha", "beta", "rc" };
-    private static readonly string[] LABELS_WE_PUBLISH_ON_MYGET = { "dev", "alpha", "beta", "rc" };
-    private static readonly string[] LABELS_WE_PUBLISH_ON_NUGET = { "beta", "rc" };
-    private static readonly string[] LABELS_WE_PUBLISH_ON_CHOCOLATEY = { "beta", "rc" };
-    private static readonly string[] LABELS_WE_PUBLISH_ON_GITHUB = { "beta", "rc" };
-    private static readonly string[] LABELS_USED_AS_TAGS = { "alpha", "beta", "rc" };
-    private static readonly string[] LABELS_WE_ADD_TO_LOCAL_FEED = { "dev", "alpha", "beta", "rc" };
+	// Pre-release labels that we publish
+	private static readonly string[] LABELS_WE_PUBLISH = { "dev", "alpha", "beta", "rc" };
+	private static readonly string[] LABELS_WE_PUBLISH_ON_MYGET = { "dev", "alpha", "beta", "rc" };
+	private static readonly string[] LABELS_WE_PUBLISH_ON_NUGET = { "beta", "rc" };
+	private static readonly string[] LABELS_WE_PUBLISH_ON_CHOCOLATEY = { "beta", "rc" };
+	private static readonly string[] LABELS_WE_PUBLISH_ON_GITHUB = { "beta", "rc" };
+	private static readonly string[] LABELS_USED_AS_TAGS = { "alpha", "beta", "rc" };
+	private static readonly string[] LABELS_WE_ADD_TO_LOCAL_FEED = { "dev", "alpha", "beta", "rc" };
 
-    #endregion
+	#endregion
 
-    private static BuildSystem _buildSystem;
+	private static BuildSystem _buildSystem;
 
 	public static void Initialize(
 		// Required parameters
@@ -134,8 +134,6 @@ public static class BuildSettings
 			Context.Warning($"  SolutionFile: '{SolutionFile}'");
 		Context.Information($"  PackageTestLevel: {PackageTestLevel}");
 
-		LocalPackagesDirectory = FindLocalPackagesDirectory() ?? ProjectDirectory + "LOCAL_PACKAGES_DIR";
-
 		// Keep this last
 		if (IsRunningOnAppVeyor)
 		{
@@ -163,14 +161,14 @@ public static class BuildSettings
 		for (var dir = new DirectoryInfo(ProjectDirectory); dir != null; dir = dir.Parent)
 		{
 			string candidate = SIO.Path.Combine(dir.FullName, "LocalPackages");
-            if (SIO.Directory.Exists(candidate))
+			if (SIO.Directory.Exists(candidate))
 				return candidate;
 		}
 
 		return null;
-    }
+	}
 
-    private static int CalcPackageTestLevel()
+	private static int CalcPackageTestLevel()
 	{
 		if (!BuildVersion.IsPreRelease)
 			return 3;
@@ -233,56 +231,57 @@ public static class BuildSettings
 	public static BuildVersion BuildVersion { get; private set; }
 	public static string BranchName => BuildVersion.BranchName;
 	public static bool IsReleaseBranch => BuildVersion.IsReleaseBranch;
+	public static bool IsLocalBranch => BuildVersion.IsLocalBranch;
 	public static string PackageVersion => BuildVersion.PackageVersion;
 	public static string AssemblyVersion => BuildVersion.AssemblyVersion;
 	public static string AssemblyFileVersion => BuildVersion.AssemblyFileVersion;
 	public static string AssemblyInformationalVersion => BuildVersion.AssemblyInformationalVersion;
 	public static bool IsDevelopmentRelease => PackageVersion.Contains("-dev");
 
-    // Chocolatey.org does not yet support semver 2.0, so we have to use a legacy format
-    private static string _chocolateyPackageVersion;
-    public static string ChocolateyPackageVersion
-    {
-        get
-        {
-            if (!IsPreRelease)
-                return PackageVersion;
+	// Chocolatey.org does not yet support semver 2.0, so we have to use a legacy format
+	private static string _chocolateyPackageVersion;
+	public static string ChocolateyPackageVersion
+	{
+		get
+		{
+			if (!IsPreRelease)
+				return PackageVersion;
 
-            if (_chocolateyPackageVersion == null)
-            {
-                // Use PackageVersion as default
-                _chocolateyPackageVersion = PackageVersion;
+			if (_chocolateyPackageVersion == null)
+			{
+				// Use PackageVersion as default
+				_chocolateyPackageVersion = PackageVersion;
 
-                var semver = BuildVersion.SemVer;
-                var label = BuildVersion.PreReleaseLabel;
-                var suffix = BuildVersion.PreReleaseSuffix;
-                int num1, num2;
+				var semver = BuildVersion.SemVer;
+				var label = BuildVersion.PreReleaseLabel;
+				var suffix = BuildVersion.PreReleaseSuffix;
+				int num1, num2;
 
-                // Our standard pre-releases are in the form <label> "." <num1> ["." <num2>]
-                // If anything else comes up, we just use the default PackageVersion
-                if (!suffix.StartsWith(label + "."))
-                    return _chocolateyPackageVersion;
+				// Our standard pre-releases are in the form <label> "." <num1> ["." <num2>]
+				// If anything else comes up, we just use the default PackageVersion
+				if (!suffix.StartsWith(label + "."))
+					return _chocolateyPackageVersion;
 
-                suffix = suffix.Substring(label.Length + 1);
-                int dot2 = suffix.IndexOf('.');
-                if (dot2 > 0) // another dot?
-                {
-                    if (int.TryParse(suffix.Substring(0, dot2), out num1) && int.TryParse(suffix.Substring(dot2 + 1), out num2))
-                        _chocolateyPackageVersion = $"{semver}-{label}{num1:000}-{num2:000}";
-                }
-                else // just one dot
-                {
-                    if (int.TryParse(suffix, out num1))
-                        _chocolateyPackageVersion = $"{semver}-{label}{num1:000}";
-                }
-            }
+				suffix = suffix.Substring(label.Length + 1);
+				int dot2 = suffix.IndexOf('.');
+				if (dot2 > 0) // another dot?
+				{
+					if (int.TryParse(suffix.Substring(0, dot2), out num1) && int.TryParse(suffix.Substring(dot2 + 1), out num2))
+						_chocolateyPackageVersion = $"{semver}-{label}{num1:000}-{num2:000}";
+				}
+				else // just one dot
+				{
+					if (int.TryParse(suffix, out num1))
+						_chocolateyPackageVersion = $"{semver}-{label}{num1:000}";
+				}
+			}
 
-            return _chocolateyPackageVersion;
-        }
-    }
+			return _chocolateyPackageVersion;
+		}
+	}
 
-    // Standard Directory Structure - not changeable by user
-    public static string ProjectDirectory => Context.Environment.WorkingDirectory.FullPath + "/";
+	// Standard Directory Structure - not changeable by user
+	public static string ProjectDirectory => Context.Environment.WorkingDirectory.FullPath + "/";
 	public static string SourceDirectory => ProjectDirectory + SRC_DIR;
 	public static string OutputDirectory => ProjectDirectory + BIN_DIR + Configuration + "/";
 	public static string NuGetDirectory => ProjectDirectory + NUGET_DIR;
@@ -301,7 +300,23 @@ public static class BuildSettings
 	public static string ZipImageDirectory => ProjectDirectory + ZIP_IMG_DIR;
 	public static string ExtensionsDirectory => ProjectDirectory + "bundled-extensions/";
 	public static string ToolsDirectory => ProjectDirectory + TOOLS_DIR;
-    public static string LocalPackagesDirectory { get; private set; }
+
+	// Local Packages directory is found or created as needed
+	private static string _localPackagesDirectory;
+	public static string LocalPackagesDirectory
+	{
+		get
+		{
+			if (_localPackagesDirectory == null)
+			{
+				_localPackagesDirectory = FindLocalPackagesDirectory() ?? ProjectDirectory + "LOCAL_PACKAGES_DIR";
+				if (!SIO.Directory.Exists(_localPackagesDirectory))
+					Context.CreateDirectory(_localPackagesDirectory);
+			}
+
+			return _localPackagesDirectory;
+		}
+	}
 
     // Files
     public static string SolutionFile { get; set; }
@@ -381,15 +396,15 @@ public static class BuildSettings
 	public static bool IsPreRelease => BuildVersion.IsPreRelease;
 	public static bool ShouldPublishRelease =>
 		!IsPreRelease || LABELS_WE_PUBLISH.Contains(BuildVersion.PreReleaseLabel);
-	public static bool ShouldPublishToMyGet =>
-		!IsPreRelease || LABELS_WE_PUBLISH_ON_MYGET.Contains(BuildVersion.PreReleaseLabel);
-	public static bool ShouldPublishToNuGet =>
-		!IsPreRelease || LABELS_WE_PUBLISH_ON_NUGET.Contains(BuildVersion.PreReleaseLabel) && !IsFractionalPreRelease;
-	public static bool ShouldPublishToChocolatey =>
-		!IsPreRelease || LABELS_WE_PUBLISH_ON_CHOCOLATEY.Contains(BuildVersion.PreReleaseLabel) && !IsFractionalPreRelease;
-	public static bool ShouldPublishToGitHub =>
-		!IsPreRelease || LABELS_WE_PUBLISH_ON_GITHUB.Contains(BuildVersion.PreReleaseLabel) && !IsFractionalPreRelease;
-	public static bool ShouldPublishToLocalFeed =>
+	public static bool ShouldPublishToMyGet => !IsLocalBranch &&
+		(!IsPreRelease || LABELS_WE_PUBLISH_ON_MYGET.Contains(BuildVersion.PreReleaseLabel));
+	public static bool ShouldPublishToNuGet => !IsLocalBranch &&
+		(!IsPreRelease || LABELS_WE_PUBLISH_ON_NUGET.Contains(BuildVersion.PreReleaseLabel) && !IsFractionalPreRelease);
+	public static bool ShouldPublishToChocolatey => !IsLocalBranch &&
+		(!IsPreRelease || LABELS_WE_PUBLISH_ON_CHOCOLATEY.Contains(BuildVersion.PreReleaseLabel) && !IsFractionalPreRelease);
+	public static bool ShouldPublishToGitHub => !IsLocalBranch &&
+		(!IsPreRelease || LABELS_WE_PUBLISH_ON_GITHUB.Contains(BuildVersion.PreReleaseLabel) && !IsFractionalPreRelease);
+	public static bool ShouldPublishToLocalFeed => IsLocalBranch ||
 		!IsPreRelease || LABELS_WE_ADD_TO_LOCAL_FEED.Contains(BuildVersion.PreReleaseLabel);
 
     public static bool IsFractionalPreRelease
@@ -504,6 +519,7 @@ public static class BuildSettings
 		Console.WriteLine("\nRELEASING");
 		Console.WriteLine("BranchName:                " + BranchName);
 		Console.WriteLine("IsReleaseBranch:           " + IsReleaseBranch);
+		Console.WriteLine("IsLocalBranch:             " + IsLocalBranch);
 		Console.WriteLine("ShouldPublishToGitHub:     " + ShouldPublishToGitHub);
 	}
 }

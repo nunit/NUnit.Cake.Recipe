@@ -13,26 +13,34 @@ public static class PackageReleaseManager
 
 		foreach (var package in BuildSettings.SelectedPackages)
 		{
-			var packageName = $"{package.PackageId}.{package.PackageVersion}.nupkg";
-            var packagePath = BuildSettings.PackageDirectory + packageName;
-			var packageType = package.PackageType;
+			string packageName = $"{package.PackageId}.{package.PackageVersion}.nupkg";
+            string packagePath = SIO.Path.Combine(BuildSettings.PackageDirectory, packageName);
 
-			bool publishToMyGet = BuildSettings.ShouldPublishToMyGet;
-			bool publishToNuGet = BuildSettings.ShouldPublishToNuGet && packageType == PackageType.NuGet;
-			bool publishToChocolatey = BuildSettings.ShouldPublishToChocolatey && packageType == PackageType.Chocolatey;
+            bool isNuGet = package.PackageType == PackageType.NuGet;
+            bool isChocolatey = package.PackageType == PackageType.Chocolatey;
+			bool isEither = isNuGet | isChocolatey;
+
+            bool publishToMyGet = isEither && BuildSettings.ShouldPublishToMyGet;
+			bool publishToNuGet = isNuGet && BuildSettings.ShouldPublishToNuGet;
+			bool publishToChocolatey = isChocolatey && BuildSettings.ShouldPublishToChocolatey;
+			bool addToLocalFeed = isEither && BuildSettings.ShouldPublishToLocalFeed;
 
             // If --nopush was specified, give a detailed message showing what would have been pushed
             if (CommandLineOptions.NoPush)
             {
-                List<string> whereToPublish = new List<string>();
+				StringBuilder destinations = new StringBuilder();
                 if (publishToMyGet)
-                    whereToPublish.Add("MyGet");
+                    destinations.Append(", MyGet");
                 if (publishToNuGet)
-                    whereToPublish.Add("NuGet");
+                    destinations.Append(", NuGet");
                 if (publishToChocolatey)
-                    whereToPublish.Add("Chocolatey");
+                    destinations.Append(", Chocolatey");
+				if (addToLocalFeed)
+					destinations.Append(", LocalPackages");
 
-				string destinations = string.Join(", ", whereToPublish);
+				if (destinations.Length > 0 && destinations[0] == ',')
+					destinations.Remove(0, 2);
+
                 _context.Information($"NoPush option skipping publication of {packageName} to {destinations}");
                 continue;
             }
@@ -42,7 +50,7 @@ public static class PackageReleaseManager
                 //ApplyReleaseTagToBuild(PackageVersion);
 
 				if (publishToMyGet)
-					if (packageType == PackageType.NuGet)
+					if (isNuGet)
 						PushNuGetPackage(packagePath, BuildSettings.MyGetApiKey, BuildSettings.MyGetPushUrl);
 					else
 						PushChocolateyPackage(packagePath, BuildSettings.MyGetApiKey, BuildSettings.MyGetPushUrl);
@@ -52,6 +60,9 @@ public static class PackageReleaseManager
 
 				if (publishToChocolatey)
 					PushChocolateyPackage(packagePath, BuildSettings.ChocolateyApiKey, BuildSettings.ChocolateyPushUrl);
+
+				if (addToLocalFeed)
+					AddPackageToLocalFeed(package);
 			}
             catch (Exception ex)
             {
@@ -64,36 +75,59 @@ public static class PackageReleaseManager
 			throw new Exception("One of the publishing steps failed.");
 	}
 
-	//public static void ApplyReleaseTagToBuild(string releaseTag)
-	//{
-	//	_context.Information($"Applying release tag {releaseTag}...");
+    public static void PushNuGetPackage(FilePath packagePath, string apiKey, string url)
+    {
+        CheckPackageExists(packagePath);
+        _context.NuGetPush(packagePath, new NuGetPushSettings() { ApiKey = apiKey, Source = url });
+    }
 
-	//	string currentTag = _context.GitDescribe(BuildSettings.ProjectDirectory, GitDescribeStrategy.Tags);
-	//	if (currentTag == releaseTag)
-	//	{
-	//		_context.Warning("  Tag already set on HEAD, possibly in a prior run.");
-	//		return;
-	//	}
+    public static void PushChocolateyPackage(FilePath packagePath, string apiKey, string url)
+    {
+        CheckPackageExists(packagePath);
+        _context.ChocolateyPush(packagePath, new ChocolateyPushSettings() { ApiKey = apiKey, Source = url });
+    }
 
-	//	try
-	//	{
- //           _context.GitTag(BuildSettings.ProjectDirectory, releaseTag);
- //           _context.Information($"  Release tagged as {releaseTag}.");
+    public static void AddPackageToLocalFeed(PackageDefinition package)
+	{
+        // Local Feed is always updated, even if the package already exists, so delete it if necessary
+        var packageDir = SIO.Path.Combine(BuildSettings.LocalPackagesDirectory, package.PackageId, package.PackageVersion);
+        if (SIO.Directory.Exists(packageDir))
+            _context.DeleteDirectory(packageDir, new DeleteDirectorySettings() { Recursive = true });
 
-	//		if (releaseTag.Contains("-alpha."))
-	//		{
-	//			_context.GitPushRef(BuildSettings.ProjectDirectory, BuildSettings.GitHubOwner, BuildSettings.GitHubAccessToken, "origin", releaseTag);
-	//			_context.Information($"  Release tag {releaseTag} was pushed to origin.");
-	//		}
- //       }
- //       catch (Exception ex)
-	//	{
-	//		if (!ex.Message.ToLower().Contains("tag already exists"))
-	//			throw;
+        CheckPackageExists(package.PackageFilePath);
+        _context.NuGetAdd(package.PackageFilePath, BuildSettings.LocalPackagesDirectory);
+    }
 
-	//		throw new Exception($"The {releaseTag} tag was used on an earlier commit. If no packages have been published, you may be able to remove that tag. Otherwise, you should advance the release version before proceeding.", ex);
-	//	}
-	//}
+    //public static void ApplyReleaseTagToBuild(string releaseTag)
+    //{
+    //	_context.Information($"Applying release tag {releaseTag}...");
+
+    //	string currentTag = _context.GitDescribe(BuildSettings.ProjectDirectory, GitDescribeStrategy.Tags);
+    //	if (currentTag == releaseTag)
+    //	{
+    //		_context.Warning("  Tag already set on HEAD, possibly in a prior run.");
+    //		return;
+    //	}
+
+    //	try
+    //	{
+    //           _context.GitTag(BuildSettings.ProjectDirectory, releaseTag);
+    //           _context.Information($"  Release tagged as {releaseTag}.");
+
+    //		if (releaseTag.Contains("-alpha."))
+    //		{
+    //			_context.GitPushRef(BuildSettings.ProjectDirectory, BuildSettings.GitHubOwner, BuildSettings.GitHubAccessToken, "origin", releaseTag);
+    //			_context.Information($"  Release tag {releaseTag} was pushed to origin.");
+    //		}
+    //       }
+    //       catch (Exception ex)
+    //	{
+    //		if (!ex.Message.ToLower().Contains("tag already exists"))
+    //			throw;
+
+    //		throw new Exception($"The {releaseTag} tag was used on an earlier commit. If no packages have been published, you may be able to remove that tag. Otherwise, you should advance the release version before proceeding.", ex);
+    //	}
+    //}
 
     /// <summary>
     /// Re-publish a symbol package after a failure. Must specify --where
@@ -129,19 +163,7 @@ public static class PackageReleaseManager
 		}
     }
 
-	private static void PushNuGetPackage(FilePath package, string apiKey, string url)
-	{
-		CheckPackageExists(package);
-		_context.NuGetPush(package, new NuGetPushSettings() { ApiKey = apiKey, Source = url });
-	}
-
-	private static void PushChocolateyPackage(FilePath package, string apiKey, string url)
-	{
-		CheckPackageExists(package);
-		_context.ChocolateyPush(package, new ChocolateyPushSettings() { ApiKey = apiKey, Source = url });
-	}
-
-	private static void CheckPackageExists(FilePath package)
+    private static void CheckPackageExists(FilePath package)
 	{
 		if (!_context.FileExists(package))
 			throw new InvalidOperationException(
@@ -159,7 +181,7 @@ public static class PackageReleaseManager
 			CommandLineOptions.PackageVersion.Exists 
 				? CommandLineOptions.PackageVersion.Value
 				: BuildSettings.IsReleaseBranch 
-					? BuildSettings.BuildVersion.BranchName.Substring(8) 
+					? BuildSettings.BranchName.Substring(8) 
 					: null;
 
 		if (releaseVersion != null)

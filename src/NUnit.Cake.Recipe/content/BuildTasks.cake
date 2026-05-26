@@ -159,6 +159,50 @@ BuildTasks.PublishTask = Task("Publish")
             Information("Nothing to publish from this run.");
     });
 
+BuildTasks.PublishToMyGetTask = Task("PublishToMyGet")
+    .Description("Publish or Re-publish any packages for MyGet")
+    .WithCriteria(() => BuildSettings.IsLocalBuild)
+    .Does(() => {
+        if (!BuildSettings.ShouldPublishToMyGet)
+            Information("Nothing to publish to MyGet from this run.");
+        else if (CommandLineOptions.NoPush)
+            Information("NoPush option suppressing publication to MyGet");
+        else
+            foreach (var package in BuildSettings.Packages)
+                if (package.PackageType == PackageType.NuGet)
+                    PackageReleaseManager.PushNuGetPackage(package.PackageFilePath, BuildSettings.MyGetApiKey, BuildSettings.MyGetPushUrl);
+                else if (package.PackageType == PackageType.Chocolatey)
+                    PackageReleaseManager.PushChocolateyPackage(package.PackageFilePath, BuildSettings.MyGetApiKey, BuildSettings.MyGetPushUrl);
+    });
+
+BuildTasks.PublishToNuGetTask = Task("PublishToNuGet")
+    .Description("Publish or Re-publish any packages for NuGet")
+    .WithCriteria(() => BuildSettings.IsLocalBuild)
+    .Does(() => {
+        if (!BuildSettings.ShouldPublishToNuGet)
+            Information("Nothing to publish to NuGet from this run.");
+        else if (CommandLineOptions.NoPush)
+            Information("NoPush option suppressing publication to NuGet");
+        else
+            foreach (var package in BuildSettings.Packages)
+                if (package.PackageType == PackageType.NuGet)
+                    PackageReleaseManager.PushNuGetPackage(package.PackageFilePath, BuildSettings.MyGetApiKey, BuildSettings.MyGetPushUrl);
+    });
+
+BuildTasks.PublishToChocolateyTask = Task("PublishToChocolatey")
+    .Description("Publish or Re-publish any packages for Chocolatey")
+    .WithCriteria(() => BuildSettings.IsLocalBuild)
+    .Does(() => {
+        if (!BuildSettings.ShouldPublishToChocolatey)
+            Information("Nothing to publish to Chocolatey from this run.");
+        else if (CommandLineOptions.NoPush)
+            Information("NoPush option suppressing publication to Chocolatey");
+        else
+            foreach (var package in BuildSettings.Packages)
+                if (package.PackageType == PackageType.Chocolatey)
+                    PackageReleaseManager.PushChocolateyPackage(package.PackageFilePath, BuildSettings.MyGetApiKey, BuildSettings.MyGetPushUrl);
+    });
+
 BuildTasks.PublishToLocalFeedTask = Task("PublishToLocalFeed")
     .Description("""
 	Publishes packages to the local feed for a dev, alpha, beta, or rc build
@@ -176,11 +220,11 @@ BuildTasks.PublishToLocalFeedTask = Task("PublishToLocalFeed")
         else
             foreach (var package in BuildSettings.Packages)
                 if (package.PackageType == PackageType.NuGet || package.PackageType == PackageType.Chocolatey)
-                    package.AddPackageToLocalFeed();
+                    PackageReleaseManager.AddPackageToLocalFeed(package);
     });
 
 BuildTasks.PublishSymbolsPackageTask = Task("PublishSymbolsPackage")
-    .Description("\"Re-publish a specific symbols package to NuGet after a failure\"")
+    .Description("Re-publish a specific symbols package to NuGet after a failure")
     .Does(() => PackageReleaseManager.PublishSymbolsPackage());
 
 BuildTasks.CreateDraftReleaseTask = Task("CreateDraftRelease")
