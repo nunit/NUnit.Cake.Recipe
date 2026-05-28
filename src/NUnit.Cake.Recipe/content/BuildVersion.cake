@@ -1,5 +1,9 @@
 public class BuildVersion
 {
+    // Prefixes for special types of branches
+    private const string RELEASE_BRANCH_PREFIX = "release-";
+    private const string LOCAL_BRANCH_PREFIX = "local-";
+
     private ICakeContext _context;
     private GitVersion _gitVersion;
 
@@ -19,9 +23,14 @@ public class BuildVersion
         _gitVersion = context.GitVersion();
 
         BranchName = _gitVersion.BranchName;
-        IsReleaseBranch = BranchName.StartsWith("release-");
+        IsReleaseBranch = BranchName.StartsWith(RELEASE_BRANCH_PREFIX);
+        IsLocalBranch = BranchName.StartsWith(LOCAL_BRANCH_PREFIX);
 
-        string packageVersion = CommandLineOptions.PackageVersion.Value ?? CalculatePackageVersion();
+        // NOTE: The version of a Release Branch does not affect the PackageVersion
+        // because it is only used for creating a draft release. On the other hand,
+        // the version of a Local Branch is used directly as the Package Version.
+        string packageVersion = CommandLineOptions.PackageVersion.Value ??
+            (IsLocalBranch ? BranchName.Substring(LOCAL_BRANCH_PREFIX.Length) : CalculatePackageVersion());
         
         int dash = packageVersion.IndexOf('-');
         IsPreRelease = dash > 0;
@@ -61,6 +70,7 @@ public class BuildVersion
 
     public string BranchName { get; }
     public bool IsReleaseBranch { get; }
+    public bool IsLocalBranch { get; }
 
     public string PackageVersion { get; }
     public string LegacyPackageVersion { get; }
