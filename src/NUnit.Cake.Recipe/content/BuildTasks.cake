@@ -28,7 +28,7 @@ public static class BuildTasks
 	//public static CakeTaskBuilder PackageBuildTask { get; set; }
 	//public static CakeTaskBuilder PackageInstallTask { get; set; }
 	//public static CakeTaskBuilder PackageVerifyTask { get; set; }
-	//public static CakeTaskBuilder PackageTestTask { get; set; }
+	public static CakeTaskBuilder PackageTestTask { get; set; }
 
 	// Publishing
 	public static CakeTaskBuilder PublishTask { get; set; }
@@ -133,6 +133,7 @@ BuildTasks.BuildTask = Task("Build")
 BuildTasks.UnitTestTask = Task("Test")
     .Description("Run unit tests")
     .IsDependentOn("Build")
+    .WithCriteria(() => !CommandLineOptions.NoTests)
     .Does(() => UnitTesting.RunAllTests());
 
 BuildTasks.PackageTask = Task("Package")
@@ -141,6 +142,14 @@ BuildTasks.PackageTask = Task("Package")
     .Does(() => {
         foreach (var package in BuildSettings.SelectedPackages)
             package.BuildVerifyAndTest();
+    });
+
+BuildTasks.PackageTestTask = Task("PackageTest")
+    .Description("Test all packages, which must already be built and installed.")
+    .Does(() =>
+    {
+        foreach (var package in BuildSettings.SelectedPackages)
+            package.RunPackageTests();
     });
 
 BuildTasks.BuildTestAndPackageTask = Task("BuildTestAndPackage")

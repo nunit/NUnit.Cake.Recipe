@@ -16,6 +16,7 @@ public static class CommandLineOptions
     static public ValueOption<int> TestLevel;
     static public ValueOption<string> TraceLevel;
     static public SimpleOption NoBuild;
+    static public SimpleOption NoTests;
     static public SimpleOption NoPush;
     static public SimpleOption Usage;
 
@@ -42,6 +43,8 @@ public static class CommandLineOptions
         TraceLevel = new ValueOption<string>("trace|tr", "Off");
 
         NoBuild = new SimpleOption("nobuild|nob");
+
+        NoTests = new SimpleOption("notests|notest|not");
 
         NoPush = new SimpleOption("nopush|nop");
 
