@@ -164,7 +164,7 @@ public abstract class PackageDefinition
             VerifySymbolPackage();
         }
 
-        if (PackageTests != null)
+        if (PackageTests != null && !CommandLineOptions.NoTests)
         {
             Banner.Display($"Testing {PackageFileName}");
             RunPackageTests();
