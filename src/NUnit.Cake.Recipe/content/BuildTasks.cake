@@ -195,7 +195,7 @@ BuildTasks.PublishToNuGetTask = Task("PublishToNuGet")
         else
             foreach (var package in BuildSettings.Packages)
                 if (package.PackageType == PackageType.NuGet)
-                    PackageReleaseManager.PushNuGetPackage(package.PackageFilePath, BuildSettings.MyGetApiKey, BuildSettings.MyGetPushUrl);
+                    PackageReleaseManager.PushNuGetPackage(package.PackageFilePath, BuildSettings.NuGetApiKey, BuildSettings.NuGetPushUrl);
     });
 
 BuildTasks.PublishToChocolateyTask = Task("PublishToChocolatey")
@@ -209,7 +209,7 @@ BuildTasks.PublishToChocolateyTask = Task("PublishToChocolatey")
         else
             foreach (var package in BuildSettings.Packages)
                 if (package.PackageType == PackageType.Chocolatey)
-                    PackageReleaseManager.PushChocolateyPackage(package.PackageFilePath, BuildSettings.MyGetApiKey, BuildSettings.MyGetPushUrl);
+                    PackageReleaseManager.PushChocolateyPackage(package.PackageFilePath, BuildSettings.ChocolateyApiKey, BuildSettings.ChocolateyPushUrl);
     });
 
 BuildTasks.PublishToLocalFeedTask = Task("PublishToLocalFeed")
