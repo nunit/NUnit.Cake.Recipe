@@ -70,7 +70,8 @@ public class PackageReference
 			{
 				"https://www.myget.org/F/nunit/api/v3/index.json",
 				"https://api.nuget.org/v3/index.json",
-				"https://community.chocolatey.org/api/v2/"
+				"https://community.chocolatey.org/api/v2/",
+				BuildSettings.LocalPackagesDirectory
 			};
 
 			Console.WriteLine("Package Sources:");
