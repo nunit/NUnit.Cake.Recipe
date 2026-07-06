@@ -6,8 +6,8 @@ public static class BuildSettings
 	private static readonly string[] DEFAULT_STANDARD_HEADER = [
 		"// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt" ];
 
-	// Standardized project directory structure - not changeable by user
-	const string SRC_DIR = "src/";
+    // Standardized project directory structure - not changeable by user
+    const string SRC_DIR = "src/";
 	const string BIN_DIR = "bin/";
 	const string NUGET_DIR = "nuget/";
 	const string CHOCO_DIR = "choco/";
@@ -230,8 +230,8 @@ public static class BuildSettings
 	// Versioning
 	public static BuildVersion BuildVersion { get; private set; }
 	public static string BranchName => BuildVersion.BranchName;
-	public static bool IsReleaseBranch => BuildVersion.IsReleaseBranch;
-	public static bool IsLocalBranch => BuildVersion.IsLocalBranch;
+	public static bool IsReleaseBranch => BuildVersion.IsReleaseBranch; //BranchName.StartsWith(RELEASE_BRANCH_PREFIX);
+	public static bool IsLocalBranch => BuildVersion.IsLocalBranch; //BranchName.StartsWith(LOCAL_BRANCH_PREFIX);
 	public static string PackageVersion => BuildVersion.PackageVersion;
 	public static string AssemblyVersion => BuildVersion.AssemblyVersion;
 	public static string AssemblyFileVersion => BuildVersion.AssemblyFileVersion;
@@ -460,7 +460,16 @@ public static class BuildSettings
 		Console.WriteLine("PreReleaseLabel:              " + BuildVersion.PreReleaseLabel);
 		Console.WriteLine("PreReleaseSuffix:             " + BuildVersion.PreReleaseSuffix);
 
-		Console.WriteLine("\nDIRECTORIES");
+		Console.WriteLine("\nVERSIONING (MINVER)");
+		var buildVersion = Context.MinVer();
+        Console.WriteLine("Version:                      " + buildVersion.Version);
+        Console.WriteLine("Major:                        " + buildVersion.Major);
+        Console.WriteLine("Minor:                        " + buildVersion.Minor);
+        Console.WriteLine("Patch:                        " + buildVersion.Patch);
+        Console.WriteLine("PreRelease:                   " + buildVersion.PreRelease);
+        Console.WriteLine("BuildMetadata:                " + buildVersion.BuildMetadata);
+
+        Console.WriteLine("\nDIRECTORIES");
 		Console.WriteLine("Project:       " + ProjectDirectory);
 		Console.WriteLine("Output:        " + OutputDirectory);
 		Console.WriteLine("Source:        " + SourceDirectory);

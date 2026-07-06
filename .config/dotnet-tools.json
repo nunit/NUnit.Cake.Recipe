@@ -22,6 +22,13 @@
         "dotnet-gitreleasemanager"
       ],
       "rollForward": false
+    },
+    "minver-cli": {
+      "version": "4.0.0",
+      "commands": [
+        "minver"
+      ],
+      "rollForward": false
     }
   }
 }
