@@ -25,9 +25,8 @@ Setup((context) =>
 		DisplayTaskErrorAndThrow("Chocolatey ApiKey is required but was not set.");
 
 	// GitHub Access Token, Owner and Repository
-	if (!CommandLineOptions.NoPush)
-		if (tasksToExecute.Contains("CreateDraftRelease") && BuildSettings.IsReleaseBranch ||
-			tasksToExecute.Contains("CreateProductionRelease") && BuildSettings.ShouldPublishToGitHub)
+	if (!CommandLineOptions.NoPush && BuildSettings.ShouldPublishToGitHub)
+		if (tasksToExecute.Contains("CreateDraftRelease") || tasksToExecute.Contains("CreateProductionRelease"))
 		{
 			if (string.IsNullOrEmpty(BuildSettings.GitHubAccessToken))
 				DisplayTaskErrorAndThrow("GitHub Access Token is required but was not set.");

@@ -170,53 +170,34 @@ public static class PackageReleaseManager
 				$"Package not found: {package.GetFilename()}.\nCode may have changed since package was last built.");
 	}
 
-	private const string DRAFT_RELEASE_ERROR =
-		"A direct call to CreateDraftRelease is permitted only:\r\n" +
-		"  * On a release branch (release-x.x.x) OR\r\n" +
-		"  * Using option --packageVersion to specify a release version";
-
 	public static void CreateDraftRelease()
 	{
-		string releaseVersion =
-			CommandLineOptions.PackageVersion.Exists 
-				? CommandLineOptions.PackageVersion.Value
-				: BuildSettings.IsReleaseBranch 
-					? BuildSettings.BranchName.Substring(8) 
-					: null;
+		string releaseVersion = CommandLineOptions.PackageVersion.Value;
 
-		if (releaseVersion != null)
-		{
-			if (CommandLineOptions.NoPush)
-				_context.Information($"NoPush option skipping creation of draft release for version {releaseVersion}");
-			else
-			{
-				string releaseName = $"{BuildSettings.Title} {releaseVersion}";
-				_context.Information($"Creating draft release for {releaseName}");
-
-				try
-				{
-					_context.GitReleaseManagerCreate(BuildSettings.GitHubAccessToken, BuildSettings.GitHubOwner, BuildSettings.GitHubRepository, new GitReleaseManagerCreateSettings()
-					{
-						Name = releaseName,
-						Milestone = releaseVersion
-					});
-				}
-				catch
-				{
-					_context.Error($"Unable to create draft release for {releaseName}.");
-					_context.Error($"Check that there is a {releaseVersion} milestone with at least one closed issue.");
-					_context.Error("");
-					throw;
-				}
-			}
-		}
+		if (!BuildSettings.ShouldPublishToGitHub)
+			_context.Information("Skipping creation of draft release because this is not a production release");
+		else if (CommandLineOptions.NoPush)
+			_context.Information($"NoPush option skipping creation of draft release for version {releaseVersion}");
 		else
 		{
-			bool calledDirectly = CommandLineOptions.Target.Value == "CreateDraftRelease";
-			if (calledDirectly)
-				throw new InvalidOperationException(DRAFT_RELEASE_ERROR);
-			else
-				_context.Information("Skipping creation of draft release because this is not a release branch");
+			string releaseName = $"{BuildSettings.Title} {releaseVersion}";
+			_context.Information($"Creating draft release for {releaseName}");
+
+			try
+			{
+				_context.GitReleaseManagerCreate(BuildSettings.GitHubAccessToken, BuildSettings.GitHubOwner, BuildSettings.GitHubRepository, new GitReleaseManagerCreateSettings()
+				{
+					Name = releaseName,
+					Milestone = releaseVersion
+				});
+			}
+			catch
+			{
+				_context.Error($"Unable to create draft release for {releaseName}.");
+				_context.Error($"Check that there is a {releaseVersion} milestone with at least one closed issue.");
+				_context.Error("");
+				throw;
+			}
 		}
 	}
 
@@ -265,8 +246,8 @@ public static class PackageReleaseManager
 
 	public static void DownloadDraftRelease()
 	{
-		if (!BuildSettings.IsReleaseBranch)
-			throw new Exception("DownloadDraftRelease requires a release branch!");
+		if (!BuildSettings.ShouldPublishToGitHub)
+			throw new Exception("DownloadDraftRelease requires a production release version!");
 
 		string milestone = BuildSettings.BranchName.Substring(8);
 
