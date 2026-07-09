@@ -48,6 +48,9 @@ public static class BuildSettings
 	private static readonly string[] LABELS_USED_AS_TAGS = { "alpha", "beta", "rc" };
 	private static readonly string[] LABELS_WE_ADD_TO_LOCAL_FEED = { "dev", "alpha", "beta", "rc" };
 
+    // Prefixes for special types of branches
+    private const string LOCAL_BRANCH_PREFIX = "local-";
+
 	#endregion
 
 	private static BuildSystem _buildSystem;
@@ -109,7 +112,9 @@ public static class BuildSettings
 		UnitTestRunner = unitTestRunner ?? new NUnitLiteRunner();
 		UnitTestArguments = unitTestArguments;
 
-		BuildVersion = new BuildVersion(context);
+		var specificVersion = CommandLineOptions.PackageVersion.Value ??
+			(IsLocalBranch ? BranchName.Substring(LOCAL_BRANCH_PREFIX.Length) : null);
+		BuildVersion = new BuildVersion(context, specificVersion);
 
 		GitHubOwner = githubOwner;
 
@@ -173,10 +178,6 @@ public static class BuildSettings
 		if (!BuildVersion.IsPreRelease)
 			return 3;
 
-		// TODO: The prerelease label is no longer being set to pr by GitVersion
-		// for some reason. This check is a workaround.
-		if (IsRunningOnAppVeyor && _buildSystem.AppVeyor.Environment.PullRequest.IsPullRequest)
-			return 2;
 		if (IsRunningOnGitHubActions && _buildSystem.GitHubActions.Environment.PullRequest.IsPullRequest)
 			return 2;
 
@@ -227,11 +228,12 @@ public static class BuildSettings
 	public static bool IsRunningOnAppVeyor => _buildSystem.AppVeyor.IsRunningOnAppVeyor;
 	public static bool IsRunningOnGitHubActions => _buildSystem.GitHubActions.IsRunningOnGitHubActions;
 
+	// Branch Name
+	public static string BranchName => Context.GitBranchCurrent(BuildSettings.ProjectDirectory).FriendlyName;
+	public static bool IsLocalBranch => BranchName.StartsWith(LOCAL_BRANCH_PREFIX);
+
 	// Versioning
 	public static BuildVersion BuildVersion { get; private set; }
-	public static string BranchName => BuildVersion.BranchName;
-	public static bool IsReleaseBranch => BuildVersion.IsReleaseBranch; //BranchName.StartsWith(RELEASE_BRANCH_PREFIX);
-	public static bool IsLocalBranch => BuildVersion.IsLocalBranch; //BranchName.StartsWith(LOCAL_BRANCH_PREFIX);
 	public static string PackageVersion => BuildVersion.PackageVersion;
 	public static string AssemblyVersion => BuildVersion.AssemblyVersion;
 	public static string AssemblyFileVersion => BuildVersion.AssemblyFileVersion;
@@ -527,7 +529,6 @@ public static class BuildSettings
 
 		Console.WriteLine("\nRELEASING");
 		Console.WriteLine("BranchName:                " + BranchName);
-		Console.WriteLine("IsReleaseBranch:           " + IsReleaseBranch);
 		Console.WriteLine("IsLocalBranch:             " + IsLocalBranch);
 		Console.WriteLine("ShouldPublishToGitHub:     " + ShouldPublishToGitHub);
 	}

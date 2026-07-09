@@ -60,7 +60,7 @@ Defaults to Release.
 #### --packageVersion=VERSION
 Specifies the full package version, including any pre-release
 suffix. This version is used directly instead of the default
-version from the script or that calculated by GitVersion.
+version from the script or that calculated by MinVer.
 Note that all other versions (AssemblyVersion, etc.) are
 derived from the package version.
 

@@ -1,29 +1,14 @@
 public class BuildVersion
 {
-    // Prefixes for special types of branches
-    private const string LOCAL_BRANCH_PREFIX = "local-";
-
-    // NOTE: This is complicated because (1) the user may have specified 
-    // the package version on the command-line and (2) GitVersion may
-    // or may not be available. We'll work on solving (2) by getting
-    // GitVersion to run for us on Linux, but (1) will alwas remain.
-    //
-    // We simplify things a by figuring out the full package version and
-    // then parsing it to provide information that is used in the build.
-    public BuildVersion(ICakeContext context)
+    public BuildVersion(ICakeContext context, string requestedVersion)
     {
          if (context==null)
             throw new ArgumentNullException(nameof(context));
 
-        BranchName = context.GitBranchCurrent(BuildSettings.ProjectDirectory).FriendlyName;
-        IsLocalBranch = BranchName.StartsWith(LOCAL_BRANCH_PREFIX);
-
-        // NOTE: The version of a Release Branch does not affect the PackageVersion
-        // because it is only used for creating a draft release. On the other hand,
-        // the version of a Local Branch is used directly as the Package Version.
-        string packageVersion = CommandLineOptions.PackageVersion.Value ??
-            (IsLocalBranch ? BranchName.Substring(LOCAL_BRANCH_PREFIX.Length) : context.MinVer().Version);
+        // If a specific version is requested, we use that, otherwise get from MinVer.
+        string packageVersion = requestedVersion ?? context.MinVer().Version;
         
+        // Wherever we got it from, parse the package version
         int dash = packageVersion.IndexOf('-');
         IsPreRelease = dash > 0;
 
@@ -61,7 +46,6 @@ public class BuildVersion
     }
 
     public string BranchName { get; }
-    public bool IsReleaseBranch { get; }
     public bool IsLocalBranch { get; }
 
     public string PackageVersion { get; }
