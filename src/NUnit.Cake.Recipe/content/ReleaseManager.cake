@@ -1,8 +1,8 @@
-public static class PackageReleaseManager
+public static class ReleaseManager
 {
 	private static ICakeContext _context;
 	
-	static PackageReleaseManager()
+	static ReleaseManager()
 	{
 		_context = BuildSettings.Context;
 	}
@@ -20,10 +20,11 @@ public static class PackageReleaseManager
             bool isChocolatey = package.PackageType == PackageType.Chocolatey;
 			bool isEither = isNuGet | isChocolatey;
 
-            bool publishToMyGet = isEither && BuildSettings.ShouldPublishToMyGet;
-			bool publishToNuGet = isNuGet && BuildSettings.ShouldPublishToNuGet;
-			bool publishToChocolatey = isChocolatey && BuildSettings.ShouldPublishToChocolatey;
-			bool addToLocalFeed = isEither && BuildSettings.ShouldPublishToLocalFeed;
+            bool publishToMyGet = BuildSettings.ShouldPublishToMyGet &&
+				(package.PackageType == PackageType.NuGet || package.PackageType == PackageType.Chocolatey);
+			bool publishToNuGet = BuildSettings.ShouldPublishToNuGet && package.PackageType == PackageType.NuGet;
+			bool publishToChocolatey = BuildSettings.ShouldPublishToChocolatey && package.PackageType == PackageType.Chocolatey;
+			bool addToLocalFeed = (package.PackageType == PackageType.NuGet || package.PackageType == PackageType.Chocolatey) && BuildSettings.ShouldPublishToLocalFeed;
 
             // If --nopush was specified, give a detailed message showing what would have been pushed
             if (CommandLineOptions.NoPush)

@@ -175,13 +175,13 @@ public static class BuildSettings
 
 	private static int CalcPackageTestLevel()
 	{
-		if (!BuildVersion.IsPreRelease)
+		if (!IsPreRelease)
 			return 3;
 
 		if (IsRunningOnGitHubActions && _buildSystem.GitHubActions.Environment.PullRequest.IsPullRequest)
 			return 2;
 
-		switch (BuildVersion.PreReleaseLabel)
+		switch (PreReleaseLabel)
 		{
 			case "pre":
 			case "rc":
@@ -228,9 +228,11 @@ public static class BuildSettings
 	public static bool IsRunningOnAppVeyor => _buildSystem.AppVeyor.IsRunningOnAppVeyor;
 	public static bool IsRunningOnGitHubActions => _buildSystem.GitHubActions.IsRunningOnGitHubActions;
 
-	// Branch Name
+	// Branch Info
 	public static string BranchName => Context.GitBranchCurrent(BuildSettings.ProjectDirectory).FriendlyName;
+	public static string BranchTag => Context.GitDescribe(BuildSettings.ProjectDirectory, GitDescribeStrategy.Tags);
 	public static bool IsLocalBranch => BranchName.StartsWith(LOCAL_BRANCH_PREFIX);
+	public static bool IsMainBranch => BranchName == "main" || BranchName == "version3";
 
 	// Versioning
 	public static BuildVersion BuildVersion { get; private set; }
@@ -238,7 +240,10 @@ public static class BuildSettings
 	public static string AssemblyVersion => BuildVersion.AssemblyVersion;
 	public static string AssemblyFileVersion => BuildVersion.AssemblyFileVersion;
 	public static string AssemblyInformationalVersion => BuildVersion.AssemblyInformationalVersion;
-	public static bool IsDevelopmentRelease => PackageVersion.Contains("-dev");
+	public static string SemVer => BuildVersion.SemVer;
+	public static bool IsPreRelease => BuildVersion.IsPreRelease;
+	public static string PreReleaseLabel => BuildVersion.PreReleaseLabel;
+	public static string PreReleaseSuffix => BuildVersion.PreReleaseSuffix;
 
 	// Chocolatey.org does not yet support semver 2.0, so we have to use a legacy format
 	private static string _chocolateyPackageVersion;
@@ -254,9 +259,9 @@ public static class BuildSettings
 				// Use PackageVersion as default
 				_chocolateyPackageVersion = PackageVersion;
 
-				var semver = BuildVersion.SemVer;
-				var label = BuildVersion.PreReleaseLabel;
-				var suffix = BuildVersion.PreReleaseSuffix;
+				var semver = SemVer;
+				var label = PreReleaseLabel;
+				var suffix = PreReleaseSuffix;
 				int num1, num2;
 
 				// Our standard pre-releases are in the form <label> "." <num1> ["." <num2>]
@@ -395,30 +400,18 @@ public static class BuildSettings
 	public static string GitHubAccessToken => Context.EnvironmentVariable(GITHUB_ACCESS_TOKEN);
 
 	// Publishing - Policies
-	public static bool IsPreRelease => BuildVersion.IsPreRelease;
-	public static bool ShouldPublishRelease =>
-		!IsPreRelease || LABELS_WE_PUBLISH.Contains(BuildVersion.PreReleaseLabel);
-	public static bool ShouldPublishToMyGet => !IsLocalBranch &&
-		(!IsPreRelease || LABELS_WE_PUBLISH_ON_MYGET.Contains(BuildVersion.PreReleaseLabel));
-	public static bool ShouldPublishToNuGet => !IsLocalBranch &&
-		(!IsPreRelease || LABELS_WE_PUBLISH_ON_NUGET.Contains(BuildVersion.PreReleaseLabel) && !IsFractionalPreRelease);
-	public static bool ShouldPublishToChocolatey => !IsLocalBranch &&
-		(!IsPreRelease || LABELS_WE_PUBLISH_ON_CHOCOLATEY.Contains(BuildVersion.PreReleaseLabel) && !IsFractionalPreRelease);
-	public static bool ShouldPublishToGitHub => !IsLocalBranch &&
-		(!IsPreRelease || LABELS_WE_PUBLISH_ON_GITHUB.Contains(BuildVersion.PreReleaseLabel) && !IsFractionalPreRelease);
-	public static bool ShouldPublishToLocalFeed => IsLocalBranch ||
-		!IsPreRelease || LABELS_WE_ADD_TO_LOCAL_FEED.Contains(BuildVersion.PreReleaseLabel);
-
-    public static bool IsFractionalPreRelease
-	{
-		get
-        {
-			int dots = 0;
-			foreach (char c in BuildVersion.PreReleaseSuffix)
-				if (c == '.') dots++;
-			return dots > 1;
-        }
-    }
+	public static bool ShouldPublishRelease => IsLocalBranch || IsMainBranch && PackageVersion == BranchTag &&
+		(!IsPreRelease || LABELS_WE_PUBLISH.Contains(PreReleaseLabel));
+	public static bool ShouldPublishToMyGet => IsMainBranch &&
+		(!IsPreRelease || LABELS_WE_PUBLISH_ON_MYGET.Contains(PreReleaseLabel) && BranchTag == PackageVersion);
+	public static bool ShouldPublishToNuGet => IsMainBranch &&
+		(!IsPreRelease || LABELS_WE_PUBLISH_ON_NUGET.Contains(PreReleaseLabel) && BranchTag == PackageVersion);
+	public static bool ShouldPublishToChocolatey => IsMainBranch &&
+		(!IsPreRelease || LABELS_WE_PUBLISH_ON_CHOCOLATEY.Contains(PreReleaseLabel) && BranchTag == PackageVersion);
+	public static bool ShouldPublishToGitHub => IsMainBranch &&
+		(!IsPreRelease || LABELS_WE_PUBLISH_ON_GITHUB.Contains(PreReleaseLabel) && BranchTag == PackageVersion);
+	public static bool ShouldPublishToLocalFeed => IsLocalBranch || IsMainBranch &&
+		(!IsPreRelease || LABELS_WE_ADD_TO_LOCAL_FEED.Contains(PreReleaseLabel) && BranchTag == PackageVersion);
 
 	private static void ValidateSettings()
 	{
@@ -457,19 +450,10 @@ public static class BuildSettings
 		Console.WriteLine("AssemblyVersion:              " + AssemblyVersion);
 		Console.WriteLine("AssemblyFileVersion:          " + AssemblyFileVersion);
 		Console.WriteLine("AssemblyInformationalVersion: " + AssemblyInformationalVersion);
-		Console.WriteLine("SemVer:                       " + BuildVersion.SemVer);
-		Console.WriteLine("IsPreRelease:                 " + BuildVersion.IsPreRelease);
-		Console.WriteLine("PreReleaseLabel:              " + BuildVersion.PreReleaseLabel);
-		Console.WriteLine("PreReleaseSuffix:             " + BuildVersion.PreReleaseSuffix);
-
-		Console.WriteLine("\nVERSIONING (MINVER)");
-		var buildVersion = Context.MinVer();
-        Console.WriteLine("Version:                      " + buildVersion.Version);
-        Console.WriteLine("Major:                        " + buildVersion.Major);
-        Console.WriteLine("Minor:                        " + buildVersion.Minor);
-        Console.WriteLine("Patch:                        " + buildVersion.Patch);
-        Console.WriteLine("PreRelease:                   " + buildVersion.PreRelease);
-        Console.WriteLine("BuildMetadata:                " + buildVersion.BuildMetadata);
+		Console.WriteLine("SemVer:                       " + SemVer);
+		Console.WriteLine("IsPreRelease:                 " + IsPreRelease);
+		Console.WriteLine("PreReleaseLabel:              " + PreReleaseLabel);
+		Console.WriteLine("PreReleaseSuffix:             " + PreReleaseSuffix);
 
         Console.WriteLine("\nDIRECTORIES");
 		Console.WriteLine("Project:       " + ProjectDirectory);

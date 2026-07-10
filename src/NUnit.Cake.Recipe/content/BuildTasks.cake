@@ -163,7 +163,7 @@ BuildTasks.PublishTask = Task("Publish")
     .IsDependentOn("Package")
     .Does(() => {
         if (BuildSettings.ShouldPublishRelease)
-            PackageReleaseManager.Publish();
+            ReleaseManager.Publish();
         else
             Information("Nothing to publish from this run.");
     });
@@ -179,9 +179,9 @@ BuildTasks.PublishToMyGetTask = Task("PublishToMyGet")
         else
             foreach (var package in BuildSettings.Packages)
                 if (package.PackageType == PackageType.NuGet)
-                    PackageReleaseManager.PushNuGetPackage(package.PackageFilePath, BuildSettings.MyGetApiKey, BuildSettings.MyGetPushUrl);
+                    ReleaseManager.PushNuGetPackage(package.PackageFilePath, BuildSettings.MyGetApiKey, BuildSettings.MyGetPushUrl);
                 else if (package.PackageType == PackageType.Chocolatey)
-                    PackageReleaseManager.PushChocolateyPackage(package.PackageFilePath, BuildSettings.MyGetApiKey, BuildSettings.MyGetPushUrl);
+                    ReleaseManager.PushChocolateyPackage(package.PackageFilePath, BuildSettings.MyGetApiKey, BuildSettings.MyGetPushUrl);
     });
 
 BuildTasks.PublishToNuGetTask = Task("PublishToNuGet")
@@ -195,7 +195,7 @@ BuildTasks.PublishToNuGetTask = Task("PublishToNuGet")
         else
             foreach (var package in BuildSettings.Packages)
                 if (package.PackageType == PackageType.NuGet)
-                    PackageReleaseManager.PushNuGetPackage(package.PackageFilePath, BuildSettings.NuGetApiKey, BuildSettings.NuGetPushUrl);
+                    ReleaseManager.PushNuGetPackage(package.PackageFilePath, BuildSettings.NuGetApiKey, BuildSettings.NuGetPushUrl);
     });
 
 BuildTasks.PublishToChocolateyTask = Task("PublishToChocolatey")
@@ -209,7 +209,7 @@ BuildTasks.PublishToChocolateyTask = Task("PublishToChocolatey")
         else
             foreach (var package in BuildSettings.Packages)
                 if (package.PackageType == PackageType.Chocolatey)
-                    PackageReleaseManager.PushChocolateyPackage(package.PackageFilePath, BuildSettings.ChocolateyApiKey, BuildSettings.ChocolateyPushUrl);
+                    ReleaseManager.PushChocolateyPackage(package.PackageFilePath, BuildSettings.ChocolateyApiKey, BuildSettings.ChocolateyPushUrl);
     });
 
 BuildTasks.PublishToLocalFeedTask = Task("PublishToLocalFeed")
@@ -229,20 +229,20 @@ BuildTasks.PublishToLocalFeedTask = Task("PublishToLocalFeed")
         else
             foreach (var package in BuildSettings.Packages)
                 if (package.PackageType == PackageType.NuGet || package.PackageType == PackageType.Chocolatey)
-                    PackageReleaseManager.AddPackageToLocalFeed(package);
+                    ReleaseManager.AddPackageToLocalFeed(package);
     });
 
 BuildTasks.PublishSymbolsPackageTask = Task("PublishSymbolsPackage")
     .Description("Re-publish a specific symbols package to NuGet after a failure")
-    .Does(() => PackageReleaseManager.PublishSymbolsPackage());
+    .Does(() => ReleaseManager.PublishSymbolsPackage());
 
 BuildTasks.CreateDraftReleaseTask = Task("CreateDraftRelease")
     .Description("Create a draft release on GitHub")
-    .Does(() => PackageReleaseManager.CreateDraftRelease());
+    .Does(() => ReleaseManager.CreateDraftRelease());
 
 BuildTasks.CreateProductionReleaseTask = Task("CreateProductionRelease")
     .Description("Create a production GitHub Release")
-    .Does(() => PackageReleaseManager.CreateProductionRelease());
+    .Does(() => ReleaseManager.CreateProductionRelease());
 
 BuildTasks.ContinuousIntegrationTask = Task("ContinuousIntegration")
     .Description("Perform continuous integration run")
