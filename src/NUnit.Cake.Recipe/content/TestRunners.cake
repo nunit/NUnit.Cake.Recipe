@@ -128,7 +128,7 @@ public abstract class InstallableTestRunner : TestRunner
 	
 	protected DirectoryPath InstallDirectory;
 
-    public virtual ExtensionSpecifier[] Dependencies => Array.Empty<ExtensionSpecifier>();
+    public virtual ExtensionSpecifier[] Dependencies { get; set; } = Array.Empty<ExtensionSpecifier>();
 
 	public FilePath ExecutablePath => InstallDirectory.CombineWithFilePath(ExecutableRelativePath);
 
@@ -216,12 +216,12 @@ public abstract class NUnitConsoleRunnerBase : InstallableTestRunner, IUnitTestR
     public int RunPackageTest(string arguments, bool redirectStandardOutput = false) =>
         base.RunPackageTest(ExecutablePath, new ProcessSettings { Arguments = arguments, RedirectStandardOutput = redirectStandardOutput });
 
-    public override ExtensionSpecifier[] Dependencies =>
+    /*public override ExtensionSpecifier[] Dependencies =>
     [
         new("NUnit.Extension.Net462PluggableAgent", "nunit-extension-net462-pluggable-agent", "4.1.1"),
         new("NUnit.Extension.Net80PluggableAgent", "nunit-extension-net80-pluggable-agent", "4.1.1"),
         new("NUnit.Extension.Net90PluggableAgent", "nunit-extension-net90-pluggable-agent", "4.1.1")
-    ];
+    ];*/
 }
 
 // The standard v3/v4 console runner, running under .NET Framework and using agents
