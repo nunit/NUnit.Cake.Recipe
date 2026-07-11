@@ -402,16 +402,27 @@ public static class BuildSettings
 	// Publishing - Policies
 	public static bool ShouldPublishRelease => IsLocalBranch || IsMainBranch && PackageVersion == BranchTag &&
 		(!IsPreRelease || LABELS_WE_PUBLISH.Contains(PreReleaseLabel));
-	public static bool ShouldPublishToMyGet => IsMainBranch &&
-		(!IsPreRelease || LABELS_WE_PUBLISH_ON_MYGET.Contains(PreReleaseLabel) && BranchTag == PackageVersion);
-	public static bool ShouldPublishToNuGet => IsMainBranch &&
-		(!IsPreRelease || LABELS_WE_PUBLISH_ON_NUGET.Contains(PreReleaseLabel) && BranchTag == PackageVersion);
-	public static bool ShouldPublishToChocolatey => IsMainBranch &&
-		(!IsPreRelease || LABELS_WE_PUBLISH_ON_CHOCOLATEY.Contains(PreReleaseLabel) && BranchTag == PackageVersion);
-	public static bool ShouldPublishToGitHub => IsMainBranch &&
-		(!IsPreRelease || LABELS_WE_PUBLISH_ON_GITHUB.Contains(PreReleaseLabel) && BranchTag == PackageVersion);
-	public static bool ShouldPublishToLocalFeed => IsLocalBranch || IsMainBranch &&
-		(!IsPreRelease || LABELS_WE_ADD_TO_LOCAL_FEED.Contains(PreReleaseLabel) && BranchTag == PackageVersion);
+	public static bool ShouldPublishToMyGet => IsMainBranch && PackageVersion == BranchTag &&
+		(!IsPreRelease || LABELS_WE_PUBLISH_ON_MYGET.Contains(PreReleaseLabel));
+	public static bool ShouldPublishToNuGet => IsMainBranch && PackageVersion == BranchTag &&
+		(!IsPreRelease || LABELS_WE_PUBLISH_ON_NUGET.Contains(PreReleaseLabel) && !IsFractionalPreRelease);
+	public static bool ShouldPublishToChocolatey => IsMainBranch && PackageVersion == BranchTag &&
+		(!IsPreRelease || LABELS_WE_PUBLISH_ON_CHOCOLATEY.Contains(PreReleaseLabel) && !IsFractionalPreRelease);
+	public static bool ShouldPublishToGitHub => IsMainBranch && PackageVersion == BranchTag &&
+		(!IsPreRelease || LABELS_WE_PUBLISH_ON_GITHUB.Contains(PreReleaseLabel) && !IsFractionalPreRelease);
+	public static bool ShouldPublishToLocalFeed => IsLocalBranch || IsMainBranch && PackageVersion == BranchTag &&
+		(!IsPreRelease || LABELS_WE_ADD_TO_LOCAL_FEED.Contains(PreReleaseLabel));
+
+    public static bool IsFractionalPreRelease
+	{
+		get
+        {
+			int dots = 0;
+			foreach (char c in BuildVersion.PreReleaseSuffix)
+				if (c == '.') dots++;
+			return dots > 1;
+        }
+    }
 
 	private static void ValidateSettings()
 	{
