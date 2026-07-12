@@ -40,13 +40,14 @@ public static class BuildSettings
 	private const string GITHUB_ACCESS_TOKEN = "GITHUB_ACCESS_TOKEN";
 
 	// Pre-release labels that we publish
-	private static readonly string[] LABELS_WE_PUBLISH = { "dev", "alpha", "beta", "rc" };
 	private static readonly string[] LABELS_WE_PUBLISH_ON_MYGET = { "dev", "alpha", "beta", "rc" };
 	private static readonly string[] LABELS_WE_PUBLISH_ON_NUGET = { "beta", "rc" };
 	private static readonly string[] LABELS_WE_PUBLISH_ON_CHOCOLATEY = { "beta", "rc" };
 	private static readonly string[] LABELS_WE_PUBLISH_ON_GITHUB = { "beta", "rc" };
 	private static readonly string[] LABELS_USED_AS_TAGS = { "alpha", "beta", "rc" };
 	private static readonly string[] LABELS_WE_ADD_TO_LOCAL_FEED = { "dev", "alpha", "beta", "rc" };
+	// NOTE: Ensure that ALL_LABELS_WE_PUBLISH is the union of all above
+	private static readonly string[] ALL_LABELS_WE_PUBLISH = { "dev", "alpha", "beta", "rc" };
 
     // Prefixes for special types of branches
     private const string LOCAL_BRANCH_PREFIX = "local-";
@@ -400,9 +401,9 @@ public static class BuildSettings
 	public static string GitHubAccessToken => Context.EnvironmentVariable(GITHUB_ACCESS_TOKEN);
 
 	// Publishing - Policies
-	public static bool ShouldPublishRelease => IsLocalBranch || IsMainBranch && PackageVersion == BranchTag &&
-		(!IsPreRelease || LABELS_WE_PUBLISH.Contains(PreReleaseLabel));
-	public static bool ShouldPublishToMyGet => IsMainBranch && PackageVersion == BranchTag &&
+	public static bool ShouldPublishRelease => IsLocalBranch || IsMainBranch &&
+		(!IsPreRelease || ALL_LABELS_WE_PUBLISH.Contains(PreReleaseLabel));
+	public static bool ShouldPublishToMyGet => IsMainBranch &&
 		(!IsPreRelease || LABELS_WE_PUBLISH_ON_MYGET.Contains(PreReleaseLabel));
 	public static bool ShouldPublishToNuGet => IsMainBranch && PackageVersion == BranchTag &&
 		(!IsPreRelease || LABELS_WE_PUBLISH_ON_NUGET.Contains(PreReleaseLabel) && !IsFractionalPreRelease);
@@ -410,7 +411,7 @@ public static class BuildSettings
 		(!IsPreRelease || LABELS_WE_PUBLISH_ON_CHOCOLATEY.Contains(PreReleaseLabel) && !IsFractionalPreRelease);
 	public static bool ShouldPublishToGitHub => IsMainBranch && PackageVersion == BranchTag &&
 		(!IsPreRelease || LABELS_WE_PUBLISH_ON_GITHUB.Contains(PreReleaseLabel) && !IsFractionalPreRelease);
-	public static bool ShouldPublishToLocalFeed => IsLocalBranch || IsMainBranch && PackageVersion == BranchTag &&
+	public static bool ShouldPublishToLocalFeed => IsLocalBranch || IsMainBranch &&
 		(!IsPreRelease || LABELS_WE_ADD_TO_LOCAL_FEED.Contains(PreReleaseLabel));
 
     public static bool IsFractionalPreRelease
@@ -517,6 +518,7 @@ public static class BuildSettings
 		Console.WriteLine("  SelectedPackages:          " + string.Join(", ", selected.ToArray()));
 
         Console.WriteLine("\nPUBLISHING");
+		Console.WriteLine("ShouldPublishRelease:      " + ShouldPublishRelease);
 		Console.WriteLine("ShouldPublishToMyGet:      " + ShouldPublishToMyGet);
 		Console.WriteLine("ShouldPublishToNuGet:      " + ShouldPublishToNuGet);
 		Console.WriteLine("ShouldPublishToChocolatey: " + ShouldPublishToChocolatey);
