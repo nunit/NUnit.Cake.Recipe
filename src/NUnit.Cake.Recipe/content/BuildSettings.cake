@@ -11,20 +11,16 @@ public static class BuildSettings
 	const string BIN_DIR = "bin/";
 	const string NUGET_DIR = "nuget/";
 	const string CHOCO_DIR = "choco/";
-	const string ZIP_DIR = "zip/";
 	const string PACKAGE_DIR = "packages/";
 	const string PKG_TEST_DIR = "packages/tests/";
 	const string NUGET_TEST_DIR = "packages/tests/nuget/";
 	//const string NUGET_RUNNER_DIR	= "packages/tests/nuget/runners/";
 	const string CHOCO_TEST_DIR = "packages/tests/choco/";
 	//const string CHOCO_RUNNER_DIR	= "packages/tests/choco/runners/";
-	const string ZIP_TEST_DIR = "packages/tests/zip/";
 	const string PKG_RSLT_DIR = "packages/results/";
 	const string NUGET_RSLT_DIR = "packages/results/nuget/";
 	const string CHOCO_RSLT_DIR = "packages/results/choco/";
-	const string ZIP_RSLT_DIR = "packages/results/zip/";
 	const string IMAGE_DIR = "packages/images";
-	const string ZIP_IMG_DIR = "packages/images/zip/";
 	const string TOOLS_DIR = "tools/";
 	const string LOCAL_PACKAGES_DIR = "../LocalPackages";
 
@@ -294,18 +290,14 @@ public static class BuildSettings
 	public static string OutputDirectory => ProjectDirectory + BIN_DIR + Configuration + "/";
 	public static string NuGetDirectory => ProjectDirectory + NUGET_DIR;
 	public static string ChocolateyDirectory => ProjectDirectory + CHOCO_DIR;
-	public static string ZipDirectory => ProjectDirectory + ZIP_DIR;
 	public static string PackageDirectory => ProjectDirectory + PACKAGE_DIR;
 	public static string PackageTestDirectory => ProjectDirectory + PKG_TEST_DIR;
 	public static string NuGetTestDirectory => ProjectDirectory + NUGET_TEST_DIR;
 	public static string ChocolateyTestDirectory => ProjectDirectory + CHOCO_TEST_DIR;
-	public static string ZipTestDirectory => ProjectDirectory + ZIP_TEST_DIR;
 	public static string PackageResultDirectory => ProjectDirectory + PKG_RSLT_DIR;
 	public static string NuGetResultDirectory => ProjectDirectory + NUGET_RSLT_DIR;
 	public static string ChocolateyResultDirectory => ProjectDirectory + CHOCO_RSLT_DIR;
-	public static string ZipResultDirectory => ProjectDirectory + ZIP_RSLT_DIR;
 	public static string ImageDirectory => ProjectDirectory + IMAGE_DIR;
-	public static string ZipImageDirectory => ProjectDirectory + ZIP_IMG_DIR;
 	public static string ExtensionsDirectory => ProjectDirectory + "bundled-extensions/";
 	public static string ToolsDirectory => ProjectDirectory + TOOLS_DIR;
 
@@ -477,13 +469,10 @@ public static class BuildSettings
 		Console.WriteLine("PackageTest:   " + PackageTestDirectory);
 		Console.WriteLine("NuGetTest:     " + NuGetTestDirectory);
 		Console.WriteLine("ChocoTest:     " + ChocolateyTestDirectory);
-		Console.WriteLine("ZipTest:       " + ZipTestDirectory);
 		Console.WriteLine("PackageResult: " + PackageResultDirectory);
 		Console.WriteLine("NuGetResult:   " + NuGetResultDirectory);
 		Console.WriteLine("ChocoResult:   " + ChocolateyResultDirectory);
-		Console.WriteLine("ZipResult:     " + ZipResultDirectory);
 		Console.WriteLine("Image:         " + ImageDirectory);
-		Console.WriteLine("ZipImage:      " + ZipImageDirectory);
 		Console.WriteLine("LocalPackages: " + LocalPackagesDirectory);
 
 		Console.WriteLine("\nBUILD");

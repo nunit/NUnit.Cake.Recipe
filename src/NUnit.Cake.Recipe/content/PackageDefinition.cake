@@ -1,8 +1,7 @@
 public enum PackageType
 {
     NuGet,
-    Chocolatey,
-    Zip
+    Chocolatey
 }
 
 public abstract class PackageDefinition

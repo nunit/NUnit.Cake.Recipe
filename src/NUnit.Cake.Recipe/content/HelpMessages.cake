@@ -31,7 +31,7 @@
 
             --packageType, --type=TYPE
                 Specifies the type package for which packaging is to be performed.
-                Valid values for TYPE are 'nuget', 'choco' and 'zip'.
+                Valid values for TYPE are 'nuget' and 'choco'.
                 If not specified, all types are processed.
 
             --level, --lev=LEVEL
