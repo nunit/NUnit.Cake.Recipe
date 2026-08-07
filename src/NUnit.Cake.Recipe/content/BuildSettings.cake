@@ -20,7 +20,6 @@ public static class BuildSettings
 	const string PKG_RSLT_DIR = "packages/results/";
 	const string NUGET_RSLT_DIR = "packages/results/nuget/";
 	const string CHOCO_RSLT_DIR = "packages/results/choco/";
-	const string IMAGE_DIR = "packages/images";
 	const string TOOLS_DIR = "tools/";
 	const string LOCAL_PACKAGES_DIR = "../LocalPackages";
 
@@ -297,7 +296,6 @@ public static class BuildSettings
 	public static string PackageResultDirectory => ProjectDirectory + PKG_RSLT_DIR;
 	public static string NuGetResultDirectory => ProjectDirectory + NUGET_RSLT_DIR;
 	public static string ChocolateyResultDirectory => ProjectDirectory + CHOCO_RSLT_DIR;
-	public static string ImageDirectory => ProjectDirectory + IMAGE_DIR;
 	public static string ExtensionsDirectory => ProjectDirectory + "bundled-extensions/";
 	public static string ToolsDirectory => ProjectDirectory + TOOLS_DIR;
 
@@ -393,17 +391,17 @@ public static class BuildSettings
 	public static string GitHubAccessToken => Context.EnvironmentVariable(GITHUB_ACCESS_TOKEN);
 
 	// Publishing - Policies
-	public static bool ShouldPublishRelease => IsLocalBranch || IsMainBranch &&
+	public static bool IsPublishEnabled => IsLocalBranch || IsMainBranch &&
 		(!IsPreRelease || ALL_LABELS_WE_PUBLISH.Contains(PreReleaseLabel));
-	public static bool ShouldPublishToMyGet => IsMainBranch &&
+	public static bool IsPublishToMyGetEnabled => IsMainBranch &&
 		(!IsPreRelease || LABELS_WE_PUBLISH_ON_MYGET.Contains(PreReleaseLabel));
-	public static bool ShouldPublishToNuGet => IsMainBranch && PackageVersion == BranchTag &&
+	public static bool IsPublishToNuGetEnabled => IsMainBranch && PackageVersion == BranchTag &&
 		(!IsPreRelease || LABELS_WE_PUBLISH_ON_NUGET.Contains(PreReleaseLabel) && !IsFractionalPreRelease);
-	public static bool ShouldPublishToChocolatey => IsMainBranch && PackageVersion == BranchTag &&
+	public static bool IsPublishToChocolateyEnabled => IsMainBranch && PackageVersion == BranchTag &&
 		(!IsPreRelease || LABELS_WE_PUBLISH_ON_CHOCOLATEY.Contains(PreReleaseLabel) && !IsFractionalPreRelease);
-	public static bool ShouldPublishToGitHub => IsMainBranch && PackageVersion == BranchTag &&
+	public static bool IsPublishToGitHubEnabled => IsMainBranch && PackageVersion == BranchTag &&
 		(!IsPreRelease || LABELS_WE_PUBLISH_ON_GITHUB.Contains(PreReleaseLabel) && !IsFractionalPreRelease);
-	public static bool ShouldPublishToLocalFeed => IsLocalBranch || IsMainBranch &&
+	public static bool IsPublishToLocalFeedEnabled => IsLocalBranch || IsMainBranch &&
 		(!IsPreRelease || LABELS_WE_ADD_TO_LOCAL_FEED.Contains(PreReleaseLabel));
 
     public static bool IsFractionalPreRelease
@@ -472,7 +470,6 @@ public static class BuildSettings
 		Console.WriteLine("PackageResult: " + PackageResultDirectory);
 		Console.WriteLine("NuGetResult:   " + NuGetResultDirectory);
 		Console.WriteLine("ChocoResult:   " + ChocolateyResultDirectory);
-		Console.WriteLine("Image:         " + ImageDirectory);
 		Console.WriteLine("LocalPackages: " + LocalPackagesDirectory);
 
 		Console.WriteLine("\nBUILD");
@@ -504,18 +501,18 @@ public static class BuildSettings
 			Console.WriteLine("  ExtensionInstallDirectory: " + package.ExtensionInstallDirectory);
 		}
 		var selected = SelectedPackages.Select(p => p.PackageId);
-		Console.WriteLine("  SelectedPackages:          " + string.Join(", ", selected.ToArray()));
+		Console.WriteLine("  SelectedPackages:              " + string.Join(", ", selected.ToArray()));
 
         Console.WriteLine("\nPUBLISHING");
-		Console.WriteLine("ShouldPublishRelease:      " + ShouldPublishRelease);
-		Console.WriteLine("ShouldPublishToMyGet:      " + ShouldPublishToMyGet);
-		Console.WriteLine("ShouldPublishToNuGet:      " + ShouldPublishToNuGet);
-		Console.WriteLine("ShouldPublishToChocolatey: " + ShouldPublishToChocolatey);
-		Console.WriteLine("ShouldPublishToLocalFeed:  " + ShouldPublishToLocalFeed);
+		Console.WriteLine("IsPublishEnabled:                " + IsPublishEnabled);
+		Console.WriteLine("IsPublishToMyGetEnabled:         " + IsPublishToMyGetEnabled);
+		Console.WriteLine("IsPublishToNuGetEnabled:         " + IsPublishToNuGetEnabled);
+		Console.WriteLine("IsPublishToChocolateyEnabled:    " + IsPublishToChocolateyEnabled);
+		Console.WriteLine("IsPublishToLocalFeedEnabled:     " + IsPublishToLocalFeedEnabled);
 
 		Console.WriteLine("\nRELEASING");
-		Console.WriteLine("BranchName:                " + BranchName);
-		Console.WriteLine("IsLocalBranch:             " + IsLocalBranch);
-		Console.WriteLine("ShouldPublishToGitHub:     " + ShouldPublishToGitHub);
+		Console.WriteLine("BranchName:                      " + BranchName);
+		Console.WriteLine("IsLocalBranch:                   " + IsLocalBranch);
+		Console.WriteLine("IsPublishToGitHubEnabled:        " + IsPublishToGitHubEnabled);
 	}
 }

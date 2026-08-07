@@ -79,7 +79,6 @@ BuildTasks.CleanTask = Task("Clean")
             CleanDirectory(binDir);
 
         CleanDirectory(BuildSettings.PackageDirectory);
-        CleanDirectory(BuildSettings.ImageDirectory);
         CleanDirectory(BuildSettings.ExtensionsDirectory);
 
         DeleteFiles(BuildSettings.ProjectDirectory + "*.log");
@@ -93,7 +92,6 @@ BuildTasks.CleanAllTask = Task("CleanAll")
             CleanDirectory(binDir);
 
         CleanDirectory(BuildSettings.PackageDirectory);
-        CleanDirectory(BuildSettings.ImageDirectory);
         CleanDirectory(BuildSettings.ExtensionsDirectory);
 
         DeleteFiles(BuildSettings.ProjectDirectory + "*.log");
@@ -162,7 +160,7 @@ BuildTasks.PublishTask = Task("Publish")
     .Description("Publish all packages for current branch")
     .IsDependentOn("Package")
     .Does(() => {
-        if (BuildSettings.ShouldPublishRelease)
+        if (BuildSettings.IsPublishEnabled)
             ReleaseManager.Publish();
         else
             Information("Nothing to publish from this run.");
@@ -172,7 +170,7 @@ BuildTasks.PublishToMyGetTask = Task("PublishToMyGet")
     .Description("Publish or Re-publish any packages for MyGet")
     .WithCriteria(() => BuildSettings.IsLocalBuild)
     .Does(() => {
-        if (!BuildSettings.ShouldPublishToMyGet)
+        if (!BuildSettings.IsPublishToMyGetEnabled)
             Information("Nothing to publish to MyGet from this run.");
         else if (CommandLineOptions.NoPush)
             Information("NoPush option suppressing publication to MyGet");
@@ -188,7 +186,7 @@ BuildTasks.PublishToNuGetTask = Task("PublishToNuGet")
     .Description("Publish or Re-publish any packages for NuGet")
     .WithCriteria(() => BuildSettings.IsLocalBuild)
     .Does(() => {
-        if (!BuildSettings.ShouldPublishToNuGet)
+        if (!BuildSettings.IsPublishToNuGetEnabled)
             Information("Nothing to publish to NuGet from this run.");
         else if (CommandLineOptions.NoPush)
             Information("NoPush option suppressing publication to NuGet");
@@ -202,7 +200,7 @@ BuildTasks.PublishToChocolateyTask = Task("PublishToChocolatey")
     .Description("Publish or Re-publish any packages for Chocolatey")
     .WithCriteria(() => BuildSettings.IsLocalBuild)
     .Does(() => {
-        if (!BuildSettings.ShouldPublishToChocolatey)
+        if (!BuildSettings.IsPublishToChocolateyEnabled)
             Information("Nothing to publish to Chocolatey from this run.");
         else if (CommandLineOptions.NoPush)
             Information("NoPush option suppressing publication to Chocolatey");
@@ -220,7 +218,7 @@ BuildTasks.PublishToLocalFeedTask = Task("PublishToLocalFeed")
 	""")
     .WithCriteria(() => BuildSettings.IsLocalBuild)
     .Does(() => {
-        if (!BuildSettings.ShouldPublishToLocalFeed)
+        if (!BuildSettings.IsPublishToLocalFeedEnabled)
             Information("Nothing to add to local feed from this run.");
         else if (CommandLineOptions.NoPush)
             Information("NoPush option suppressing publication to local feed");

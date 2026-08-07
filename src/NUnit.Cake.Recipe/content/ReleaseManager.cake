@@ -20,11 +20,11 @@ public static class ReleaseManager
             bool isChocolatey = package.PackageType == PackageType.Chocolatey;
 			bool isEither = isNuGet | isChocolatey;
 
-            bool publishToMyGet = BuildSettings.ShouldPublishToMyGet &&
+            bool publishToMyGet = BuildSettings.IsPublishToMyGetEnabled &&
 				(package.PackageType == PackageType.NuGet || package.PackageType == PackageType.Chocolatey);
-			bool publishToNuGet = BuildSettings.ShouldPublishToNuGet && package.PackageType == PackageType.NuGet;
-			bool publishToChocolatey = BuildSettings.ShouldPublishToChocolatey && package.PackageType == PackageType.Chocolatey;
-			bool addToLocalFeed = (package.PackageType == PackageType.NuGet || package.PackageType == PackageType.Chocolatey) && BuildSettings.ShouldPublishToLocalFeed;
+			bool publishToNuGet = BuildSettings.IsPublishToNuGetEnabled && package.PackageType == PackageType.NuGet;
+			bool publishToChocolatey = BuildSettings.IsPublishToChocolateyEnabled && package.PackageType == PackageType.Chocolatey;
+			bool addToLocalFeed = (package.PackageType == PackageType.NuGet || package.PackageType == PackageType.Chocolatey) && BuildSettings.IsPublishToLocalFeedEnabled;
 
             // If --nopush was specified, give a detailed message showing what would have been pushed
             if (CommandLineOptions.NoPush)
@@ -136,7 +136,7 @@ public static class ReleaseManager
     /// </summary>
     public static void PublishSymbolsPackage()
 	{
-		if (!BuildSettings.ShouldPublishToNuGet)
+		if (!BuildSettings.IsPublishToNuGetEnabled)
 			_context.Information("Nothing to publish to NuGet from this run.");
 		else if (CommandLineOptions.NoPush)
 			_context.Information("NoPush option suppressing publication to NuGet");
@@ -175,7 +175,7 @@ public static class ReleaseManager
 	{
 		string releaseVersion = CommandLineOptions.PackageVersion.Value;
 
-		if (!BuildSettings.ShouldPublishToGitHub)
+		if (!BuildSettings.IsPublishToGitHubEnabled)
 			_context.Information("Skipping creation of draft release because this is not a production release");
 		else if (CommandLineOptions.NoPush)
 			_context.Information($"NoPush option skipping creation of draft release for version {releaseVersion}");
@@ -212,7 +212,7 @@ public static class ReleaseManager
 		string releaseVersion =
 			CommandLineOptions.PackageVersion.Exists 
 				? CommandLineOptions.PackageVersion.Value
-				: BuildSettings.ShouldPublishToGitHub 
+				: BuildSettings.IsPublishToGitHubEnabled 
 					? BuildSettings.PackageVersion 
 					: null;
 
@@ -247,7 +247,7 @@ public static class ReleaseManager
 
 	public static void DownloadDraftRelease()
 	{
-		if (!BuildSettings.ShouldPublishToGitHub)
+		if (!BuildSettings.IsPublishToGitHubEnabled)
 			throw new Exception("DownloadDraftRelease requires a production release version!");
 
 		string milestone = BuildSettings.BranchName.Substring(8);
@@ -258,7 +258,7 @@ public static class ReleaseManager
 
 	public static void CreateProductionRelease()
 	{
-		if (!BuildSettings.ShouldPublishToGitHub)
+		if (!BuildSettings.IsPublishToGitHubEnabled)
 		{
 			_context.Information("Skipping CreateProductionRelease because this is not a production release");
 		}
