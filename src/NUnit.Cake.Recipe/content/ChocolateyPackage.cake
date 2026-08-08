@@ -71,7 +71,6 @@ public class ChocolateyPackage : PackageDefinition
                 Tags = Tags,
                 // From BuildSettings
                 LicenseUrl = new Uri($"{NUNIT_RAW_URL}{BuildSettings.GitHubRepository}/main/LICENSE.txt"),
-                Verbose = BuildSettings.ChocolateyVerbosity,
                 OutputDirectory = BuildSettings.PackageDirectory,
                 ProjectSourceUrl = new Uri(repositoryUrl),
                 PackageSourceUrl = new Uri(repositoryUrl),

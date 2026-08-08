@@ -209,7 +209,7 @@ public abstract class PackageDefinition
             OutputDirectory = PackageInstallDirectory,
             //ExcludeVersion = true,
 		    Prerelease = true,
-            Verbosity = BuildSettings.NuGetVerbosity,
+            Verbosity = NuGetVerbosity.Quiet,
             ArgumentCustomization = args => args.Append("-NoHttpCache")
 	    };
 

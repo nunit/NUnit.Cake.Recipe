@@ -65,11 +65,6 @@ public static class BuildSettings
 		string solutionFile = null,
 		bool buildWithMSBuild = false,
 
-		DotNetVerbosity dotnetVerbosity = DotNetVerbosity.Minimal,
-		Verbosity msbuildVerbosity = Verbosity.Minimal,
-		NuGetVerbosity nugetVerbosity = NuGetVerbosity.Normal,
-		bool chocolateyVerbosity = false,
-
 		string[] validConfigurations = null,
 		string githubOwner = "NUnit",
 
@@ -95,11 +90,6 @@ public static class BuildSettings
 
 		SolutionFile = solutionFile ?? DeduceSolutionFile();
 		BuildWithMSBuild = buildWithMSBuild;
-
-		DotNetVerbosity = dotnetVerbosity;
-		MSBuildVerbosity = msbuildVerbosity;
-		NuGetVerbosity = nugetVerbosity;
-		ChocolateyVerbosity = chocolateyVerbosity;
 
 		ValidConfigurations = validConfigurations ?? DEFAULT_VALID_CONFIGS;
 
@@ -322,17 +312,10 @@ public static class BuildSettings
 	// Building
 	public static string[] ValidConfigurations { get; set; }
 
-	public static DotNetVerbosity DotNetVerbosity { get; set; }
-	public static Verbosity MSBuildVerbosity { get; set; }
-	public static NuGetVerbosity NuGetVerbosity { get; set; }
-	// The chocolatey Setting is actually bool Verbose, but we use verbosity 
-	// so it lines up with the settings for NuGet
-	public static bool ChocolateyVerbosity { get; set; }
-
 	public static bool BuildWithMSBuild { get; set; }
 	public static MSBuildSettings MSBuildSettings => new MSBuildSettings
 	{
-		Verbosity = MSBuildVerbosity,
+		Verbosity = Verbosity.Minimal,
 		Configuration = Configuration,
 		PlatformTarget = PlatformTarget.MSIL
 	};
@@ -340,7 +323,7 @@ public static class BuildSettings
 	{
 		Configuration = Configuration,
 		NoRestore = true,
-		Verbosity = DotNetVerbosity,
+		Verbosity = DotNetVerbosity.Minimal,
 		MSBuildSettings = new DotNetMSBuildSettings
 		{
 			BinaryLogger = new MSBuildBinaryLoggerSettings
@@ -473,21 +456,21 @@ public static class BuildSettings
 		Console.WriteLine("LocalPackages: " + LocalPackagesDirectory);
 
 		Console.WriteLine("\nBUILD");
-		Console.WriteLine("Configuration:   " + Configuration);
+		Console.WriteLine("Configuration:       " + Configuration);
 
         Console.WriteLine("\nUNIT TESTS");
-        Console.WriteLine("UnitTests:                 " + UnitTests);
-        Console.WriteLine("UnitTestRunner:            " + UnitTestRunner?.GetType().Name ?? "<NUnitLiteRunner>");
+        Console.WriteLine("UnitTests:           " + UnitTests);
+        Console.WriteLine("UnitTestRunner:      " + UnitTestRunner?.GetType().Name ?? "<NUnitLiteRunner>");
 
 		Console.WriteLine("\nPACKAGING");
-		Console.WriteLine("PackageTestLevel:          " + PackageTestLevel);
-		Console.WriteLine("MyGetPushUrl:              " + MyGetPushUrl);
-		Console.WriteLine("NuGetPushUrl:              " + NuGetPushUrl);
-		Console.WriteLine("ChocolateyPushUrl:         " + ChocolateyPushUrl);
-		Console.WriteLine("MyGetApiKey:               " + (!string.IsNullOrEmpty(MyGetApiKey) ? "AVAILABLE" : "NOT AVAILABLE"));
-		Console.WriteLine("NuGetApiKey:               " + (!string.IsNullOrEmpty(NuGetApiKey) ? "AVAILABLE" : "NOT AVAILABLE"));
-		Console.WriteLine("ChocolateyApiKey:          " + (!string.IsNullOrEmpty(ChocolateyApiKey) ? "AVAILABLE" : "NOT AVAILABLE"));
-        Console.WriteLine("GitHubAccessToken:         " + (!string.IsNullOrEmpty(GitHubAccessToken) ? "AVAILABLE" : "NOT AVAILABLE"));
+		Console.WriteLine("PackageTestLevel:    " + PackageTestLevel);
+		Console.WriteLine("MyGetPushUrl:        " + MyGetPushUrl);
+		Console.WriteLine("NuGetPushUrl:        " + NuGetPushUrl);
+		Console.WriteLine("ChocolateyPushUrl:   " + ChocolateyPushUrl);
+		Console.WriteLine("MyGetApiKey:         " + (!string.IsNullOrEmpty(MyGetApiKey) ? "AVAILABLE" : "NOT AVAILABLE"));
+		Console.WriteLine("NuGetApiKey:         " + (!string.IsNullOrEmpty(NuGetApiKey) ? "AVAILABLE" : "NOT AVAILABLE"));
+		Console.WriteLine("ChocolateyApiKey:    " + (!string.IsNullOrEmpty(ChocolateyApiKey) ? "AVAILABLE" : "NOT AVAILABLE"));
+        Console.WriteLine("GitHubAccessToken:   " + (!string.IsNullOrEmpty(GitHubAccessToken) ? "AVAILABLE" : "NOT AVAILABLE"));
 
 		Console.WriteLine("\nPACKAGES");
 		foreach (var package in Packages)

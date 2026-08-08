@@ -74,7 +74,6 @@ public class NuGetPackage : PackageDefinition
                 Tags = Tags,
                 BasePath = BasePath,
                 // From BuildSettings
-                Verbosity = BuildSettings.NuGetVerbosity,
                 OutputDirectory = BuildSettings.PackageDirectory,
                 Repository = new NuGetRepository() { Type = "Git", Url = repositoryUrl },
                 Symbols = HasSymbols,
@@ -116,7 +115,7 @@ public class NuGetPackage : PackageDefinition
                 new MSBuildSettings
                 {
                     Target = "pack",
-                    Verbosity = BuildSettings.MSBuildVerbosity,
+                    Verbosity = Verbosity.Minimal,
                     Configuration = BuildSettings.Configuration,
                     PlatformTarget = PlatformTarget.MSIL,
                     //AllowPreviewVersion = BuildSettings.MSBuildAllowPreviewVersion

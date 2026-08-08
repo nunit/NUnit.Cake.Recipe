@@ -109,8 +109,7 @@ BuildTasks.RestoreTask = Task("Restore")
         {
             Source = new string[]   {
                 "https://www.nuget.org/api/v2",
-                "https://www.myget.org/F/nunit/api/v2" },
-            Verbosity = BuildSettings.NuGetVerbosity
+                "https://www.myget.org/F/nunit/api/v2" }
         });
     });
 
