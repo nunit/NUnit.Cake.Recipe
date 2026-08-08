@@ -173,10 +173,10 @@ public static class ReleaseManager
 
 	public static void CreateDraftRelease()
 	{
-		string releaseVersion = CommandLineOptions.PackageVersion.Value;
+		string releaseVersion = BuildSettings.PackageVersion;
 
 		if (!BuildSettings.IsPublishToGitHubEnabled)
-			_context.Information("Skipping creation of draft release because this is not a production release");
+			_context.Information($"Skipping creation of draft release {releaseVersion} because this is not a production release");
 		else if (CommandLineOptions.NoPush)
 			_context.Information($"NoPush option skipping creation of draft release for version {releaseVersion}");
 		else
