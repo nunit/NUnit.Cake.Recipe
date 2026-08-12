@@ -63,7 +63,6 @@ public static class BuildSettings
 		string[] exemptFiles = null,
 
 		string solutionFile = null,
-		bool buildWithMSBuild = false,
 
 		string[] validConfigurations = null,
 		string githubOwner = "NUnit",
@@ -89,7 +88,6 @@ public static class BuildSettings
 		_buildSystem = context.BuildSystem();
 
 		SolutionFile = solutionFile ?? DeduceSolutionFile();
-		BuildWithMSBuild = buildWithMSBuild;
 
 		ValidConfigurations = validConfigurations ?? DEFAULT_VALID_CONFIGS;
 
@@ -147,11 +145,14 @@ public static class BuildSettings
 		return null;
 	}
 
+	// This method allows the LocalPackages directory to be found in a parent directory of the project,
+	// so that multiple projects can share a single local feed when building locally. If not found, as
+	// is the case when building on a build server, it will be created in a default location.
 	private static string FindLocalPackagesDirectory()
 	{
 		for (var dir = new DirectoryInfo(ProjectDirectory); dir != null; dir = dir.Parent)
 		{
-			string candidate = SIO.Path.Combine(dir.FullName, "LocalPackages");
+			string candidate = SIO.Path.Combine(dir.FullName, LOCAL_PACKAGES_DIR);
 			if (SIO.Directory.Exists(candidate))
 				return candidate;
 		}
@@ -312,7 +313,6 @@ public static class BuildSettings
 	// Building
 	public static string[] ValidConfigurations { get; set; }
 
-	public static bool BuildWithMSBuild { get; set; }
 	public static MSBuildSettings MSBuildSettings => new MSBuildSettings
 	{
 		Verbosity = Verbosity.Minimal,

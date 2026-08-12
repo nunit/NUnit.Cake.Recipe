@@ -147,6 +147,9 @@ public abstract class PackageDefinition
         Banner.Display($"Building {PackageFileName}");
         BuildPackage();
 
+        Banner.Display($"Adding {PackageFileName} to local feed");
+        AddPackageToLocalFeed();
+
         Banner.Display($"Installing {PackageFileName}");
         InstallPackage();
 
@@ -198,16 +201,8 @@ public abstract class PackageDefinition
     {
 	    var installSettings = new NuGetInstallSettings
 	    {
-		    Source = new [] {
-                // Package will be found here
-                BuildSettings.PackageDirectory,
-                // Dependencies may be in any of these
-			    "https://www.myget.org/F/nunit/api/v3/index.json",
-			    "https://api.nuget.org/v3/index.json",
-                BuildSettings.LocalPackagesDirectory },
             Version = PackageVersion,
             OutputDirectory = PackageInstallDirectory,
-            //ExcludeVersion = true,
 		    Prerelease = true,
             Verbosity = NuGetVerbosity.Quiet,
             ArgumentCustomization = args => args.Append("-NoHttpCache")

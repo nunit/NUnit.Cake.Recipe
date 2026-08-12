@@ -105,12 +105,7 @@ BuildTasks.RestoreTask = Task("Restore")
     .WithCriteria(() => BuildSettings.SolutionFile != null)
     .WithCriteria(() => !CommandLineOptions.NoBuild)
     .Does(() => {
-        NuGetRestore(BuildSettings.SolutionFile, new NuGetRestoreSettings()
-        {
-            Source = new string[]   {
-                "https://www.nuget.org/api/v2",
-                "https://www.myget.org/F/nunit/api/v2" }
-        });
+        DotNetRestore();
     });
 
 BuildTasks.BuildTask = Task("Build")
@@ -121,10 +116,7 @@ BuildTasks.BuildTask = Task("Build")
     .IsDependentOn("CheckHeaders")
     .Description("Build the solution")
     .Does(() => {
-        if (BuildSettings.BuildWithMSBuild)
-            MSBuild(BuildSettings.SolutionFile, BuildSettings.MSBuildSettings);
-        else
-            DotNetBuild(BuildSettings.SolutionFile, BuildSettings.DotNetBuildSettings);
+        DotNetBuild(BuildSettings.SolutionFile, BuildSettings.DotNetBuildSettings);
     });
 
 BuildTasks.UnitTestTask = Task("Test")
