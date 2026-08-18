@@ -105,7 +105,7 @@ BuildTasks.RestoreTask = Task("Restore")
     .WithCriteria(() => BuildSettings.SolutionFile != null)
     .WithCriteria(() => !CommandLineOptions.NoBuild)
     .Does(() => {
-        DotNetRestore();
+        DotNetRestore(BuildSettings.SolutionFile);
     });
 
 BuildTasks.BuildTask = Task("Build")
