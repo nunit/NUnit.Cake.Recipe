@@ -1,4 +1,4 @@
-﻿name: Publish Recipe
+﻿name: Continuous Integration
 
 on:
   workflow_dispatch:
@@ -33,8 +33,8 @@ jobs:
     - name: 🛠️ Install dotnet tools
       run: dotnet tool restore
 
-    - name: 🔨 Package and Publish Recipe
-      run: dotnet cake --target=Publish --configuration=Release
+    - name: 🔨 Package and Publish Recipe to MyGet
+      run: dotnet cake --target=ContinuousIntegration --configuration=Release
 
     # Upload packages
     - name: 💾 Upload Packages

@@ -159,7 +159,6 @@ BuildTasks.PublishTask = Task("Publish")
 
 BuildTasks.PublishToMyGetTask = Task("PublishToMyGet")
     .Description("Publish or Re-publish any packages for MyGet")
-    .WithCriteria(() => BuildSettings.IsLocalBuild)
     .Does(() => {
         if (!BuildSettings.IsPublishToMyGetEnabled)
             Information("Nothing to publish to MyGet from this run.");
@@ -239,7 +238,5 @@ BuildTasks.ContinuousIntegrationTask = Task("ContinuousIntegration")
     .IsDependentOn("Build")
     .IsDependentOn("Test")
     .IsDependentOn("Package")
-    .IsDependentOn("Publish")
-    .IsDependentOn("CreateDraftRelease")
-    .IsDependentOn("CreateProductionRelease");
+    .IsDependentOn("PublishToMyGet");
 
