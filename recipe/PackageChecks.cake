@@ -195,7 +195,18 @@ public class DependencyCheck : PackageCheck
     {
         var packageInstallPath = testDirPath.GetParent();
         string pattern = packageInstallPath.Combine(_packageId) + ".*";
-        var installedPackages = new List<string>(_context.GetDirectories(pattern).Select(p => p.FullPath));
+        List<string> installedPackages = new List<string>();
+        foreach (var dir in _context.GetDirectories(pattern))
+        {
+            int index = pattern.Length -2;
+            string fullPath = dir.FullPath;
+            // Note: We are looking for directories that match the pattern "packageId.*" where * is a version number.
+            // We check that the character after the dot is a digit to ensure it's a version number. This also deals
+            // with the case where the package id itself contains a dot or is a prefix of some other package id. For
+            // example, if the package id is "NUnit.Extensibility", we don't want to match "NUnit..Extensibility.Api."
+            if (fullPath.Length >= index + 2 && fullPath[index] == '.' && char.IsDigit(fullPath[index + 1]))
+                installedPackages.Add(fullPath);
+        }
 
         DirectoryPath packagePath = GetDependentPackagePath(packageInstallPath);
         if (packagePath == null)
