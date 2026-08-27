@@ -14,41 +14,6 @@ public class PackageReference
 		Version = version;
 	}
 
-    public PackageReference LatestDevBuild => GetLatestDevBuild();
-	public PackageReference LatestRelease => GetLatestRelease();
-	
-	private PackageReference GetLatestDevBuild()
-	{
-		var packageList = _context.NuGetList(Id, new NuGetListSettings()
-		{
-			Prerelease = true, 
-			Source = new [] { "https://www.myget.org/F/nunit/api/v3/index.json" } 
-		} );
-
-		foreach (var package in packageList)
-			return new PackageReference(package.Name, package.Version);
-		
-		return this;
-	}
-
-	private PackageReference GetLatestRelease()
-	{
-		var packageList = _context.NuGetList(Id, new NuGetListSettings()
-		{
-			Prerelease = true, 
-			Source = new [] { 
-				"https://www.nuget.org/api/v2/",
-				"https://community.chocolatey.org/api/v2/" } 
-		} );
-
-		// TODO: There seems to be an error in NuGet or in Cake, causing the list to
-		// contain ALL NuGet packages, so we check the Id in this loop.
-		foreach (var package in packageList)
-			if (package.Name == Id)
-				return new PackageReference(Id, package.Version);
-
-		return this;
-	}
 
     public bool IsInstalled(string installDirectory)
 	{

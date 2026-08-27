@@ -17,7 +17,6 @@ public class ExtensionSpecifier
 
 	public PackageReference NuGetPackage => new PackageReference(NuGetId, Version);
 	public PackageReference ChocoPackage => new PackageReference(ChocoId, Version);
-	public PackageReference LatestChocolateyRelease => ChocoPackage.LatestRelease;
 	
 	// Return an extension specifier using the same package ids as this
 	// one but specifying a particular version to be used.

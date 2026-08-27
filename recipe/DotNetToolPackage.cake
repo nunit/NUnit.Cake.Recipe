@@ -28,8 +28,7 @@ public class DotNetToolPackage : NuGetPackage
 
     public override void InstallPackage()
     {
-        var arguments = $"tool install {PackageId} --version {PackageVersion} " + 
-            $"--add-source \"{BuildSettings.PackageDirectory}\" --tool-path \"{PackageInstallDirectory}\"";
+        var arguments = $"tool install {PackageId} --version {PackageVersion} --tool-path \"{PackageInstallDirectory}\"";
         Console.WriteLine($"Executing dotnet {arguments}");
         _context.StartProcess("dotnet", arguments);
     }
