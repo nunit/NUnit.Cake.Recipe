@@ -17,6 +17,15 @@ public static class Dotnet
     public static string X86Executable => X86InstallPath + "dotnet.exe";
     public static bool IsX86Installed => SIO.Directory.Exists(X86InstallPath) && SIO.File.Exists(X86Executable);
 
+    public static void Execute(string arguments, bool forX86 = false)
+    {
+        string exe = forX86 ? X86Executable : Executable;
+        if (!SIO.File.Exists(exe))
+            throw new Exception($"Dotnet executable not found: {exe}");
+        _context.Information($"Executing dotnet {arguments}");
+        _context.StartProcess(exe, arguments);
+    }
+
     public static void Display()
     {
         _context.Information($"Install Path:      {InstallPath}");

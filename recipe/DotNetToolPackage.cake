@@ -26,10 +26,16 @@ public class DotNetToolPackage : NuGetPackage
 
     public override string PackageTestDirectory => PackageInstallDirectory;
 
+    public override void BuildPackage()
+    {
+        if (PackageSource.EndsWith(".csproj"))
+            Dotnet.Execute($"pack \"{PackageSource}\" --version {BuildSettings.PackageVersion} --configuration {BuildSettings.Configuration} --output \"{BuildSettings.PackageDirectory}\"");
+        else
+            base.BuildPackage();
+    }
+
     public override void InstallPackage()
     {
-        var arguments = $"tool install {PackageId} --version {PackageVersion} --tool-path \"{PackageInstallDirectory}\"";
-        Console.WriteLine($"Executing dotnet {arguments}");
-        _context.StartProcess("dotnet", arguments);
+        Dotnet.Execute($"tool install {PackageId} --version {PackageVersion} --tool-path \"{PackageInstallDirectory}\"");
     }
 }
