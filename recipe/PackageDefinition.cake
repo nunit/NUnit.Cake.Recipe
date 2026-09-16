@@ -308,15 +308,6 @@ public abstract class PackageDefinition
 
                     Console.WriteLine("\nERROR: No result found!");
                 }
-
-                //else
-                //{
-                //    var report = new PackageTestReport(packageTest, rc, runner);
-                //    reporter.AddReport(report);
-
-                //    if (rc != packageTest.ExpectedReturnCode)
-                //        Console.WriteLine($"\nERROR: Expected rc = {packageTest.ExpectedReturnCode} but got {rc}!");
-                //}
             }
         }
 

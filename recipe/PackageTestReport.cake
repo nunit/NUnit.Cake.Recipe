@@ -39,7 +39,7 @@ public class PackageTestReport
 
 				if (expected.AssemblyName != actual.AssemblyName)
 					Errors.Add($"   Expected: {expected.AssemblyName} But was: {actual.AssemblyName}");
-				else if (runner == null || runner.PackageId == "NUnit.ConsoleRunner.NetCore")
+				else
 				{
 					if (actual.Runtime == null)
 						Warnings.Add($"Unable to determine actual runtime used for {expected.AssemblyName}");
@@ -99,7 +99,9 @@ public class PackageTestReport
 		writer.WriteLine();
 		writer.WriteLine($"{index}. {Test.Description}");
 		if (Runner != null)
-		    writer.WriteLine($"   Runner: {Runner.PackageId} {Runner.Version}");
+		    writer.WriteLine(Runner.PackageId != null
+				? $"   Runner: {Runner.PackageId} {Runner.Version}"
+				: $"   Runner: {Runner.GetType().Name}");
 		writer.WriteLine($"   Args: {Test.Arguments}");
 		writer.WriteLine();
 
