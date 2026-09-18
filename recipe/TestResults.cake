@@ -101,7 +101,7 @@ public class ActualAssemblyResult
 		var settings = xml.SelectSingleNode("settings");
 
 		// If TargetRuntimeFramework setting is not present, the Runner will probably crash
-		var runtimeSetting = settings?.SelectSingleNode("setting[@name='TargetRuntimeFramework']");
+		var runtimeSetting = settings?.SelectSingleNode("setting[@name='TargetFrameworkName']");
 		Runtime = runtimeSetting?.Attributes["value"]?.Value;
 
 		var agentSetting = settings?.SelectSingleNode("setting[@name='SelectedAgentName']");

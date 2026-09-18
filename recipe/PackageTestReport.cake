@@ -39,12 +39,15 @@ public class PackageTestReport
 
 				if (expected.AssemblyName != actual.AssemblyName)
 					Errors.Add($"   Expected: {expected.AssemblyName} But was: {actual.AssemblyName}");
-				else
+				else if (expected.Runtime != null)
 				{
 					if (actual.Runtime == null)
 						Warnings.Add($"Unable to determine actual runtime used for {expected.AssemblyName}");
-					else if (expected.Runtime != actual.Runtime)
-						Errors.Add($"   Assembly {actual.AssemblyName} Expected: {expected.Runtime} But was: {actual.Runtime}");
+					else 
+					{
+						if (expected.Runtime != actual.Runtime)
+							Errors.Add($"   Assembly {actual.AssemblyName} Expected: {expected.Runtime} But was: {actual.Runtime}");
+					}
 				}
 			}
 
