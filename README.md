@@ -44,6 +44,11 @@ Build.Run();                                         // Note 4
 
 4. Run the selected target. This must be the last command in the file.
 
+## Testing the recipe
+
+The [source harness](harness/README.md) tests maintained recipe scripts directly,
+with controlled package responses and a real Cake smoke target.
+
 ## Supported Arguments
 
 The recipe supports a number of standard command-line arguments. Additional arguments may be
