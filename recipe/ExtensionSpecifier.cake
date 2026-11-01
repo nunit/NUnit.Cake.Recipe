@@ -25,11 +25,11 @@ public class ExtensionSpecifier
 		return new ExtensionSpecifier(NuGetId, ChocoId, version);
 	}
 
-	public ExtensionSpecifier LatestFullRelease 
-		=> new ExtensionSpecifier(NuGetId, ChocoId, new PackageReference(NuGetId).LatestFullRelease.Version);
+	public ExtensionSpecifier LatestStableRelease 
+		=> new ExtensionSpecifier(NuGetId, ChocoId, new PackageReference(NuGetId).LatestStableRelease.Version);
 
-	public ExtensionSpecifier LatestPreRelease 
-		=> new ExtensionSpecifier(NuGetId, ChocoId, new PackageReference(NuGetId).LatestPreRelease.Version);
+	public ExtensionSpecifier LatestReleaseIncludingPreReleases 
+		=> new ExtensionSpecifier(NuGetId, ChocoId, new PackageReference(NuGetId).LatestReleaseIncludingPreReleases.Version);
 
 	public ExtensionSpecifier LatestDevBuild 
 		=> new ExtensionSpecifier(NuGetId, ChocoId, new PackageReference(NuGetId).LatestDevBuild.Version);

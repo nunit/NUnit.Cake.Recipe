@@ -172,20 +172,20 @@ public class DependencyCheck : PackageCheck
         _packageVersion = packageReference.Version;
     }
 
-    public DependencyCheck LatestFullRelease
+    public DependencyCheck LatestStableRelease
     {
         get
         {
-            _packageVersion = new PackageReference(_packageId).LatestFullRelease.Version;
+            _packageVersion = new PackageReference(_packageId).LatestStableRelease.Version;
             return this;
         }
     }
 
-    public DependencyCheck LatestPreRelease
+    public DependencyCheck LatestReleaseIncludingPreReleases
     {
         get
         {
-            _packageVersion = new PackageReference(_packageId).LatestPreRelease.Version;
+            _packageVersion = new PackageReference(_packageId).LatestReleaseIncludingPreReleases.Version;
             return this;
         }
     }
