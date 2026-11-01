@@ -157,6 +157,8 @@ public class DependencyCheck : PackageCheck
 	private string _packageId;
 	private string _packageVersion;
 
+    private Func<string> _versionResolver;
+
     private List<DirectoryCheck> _directoryChecks = new List<DirectoryCheck>();
     private List<FilePath> _files = new List<FilePath>();
 
@@ -176,7 +178,7 @@ public class DependencyCheck : PackageCheck
     {
         get
         {
-            _packageVersion = new PackageReference(_packageId).LatestStableRelease.Version;
+            _versionResolver = () => new PackageReference(_packageId).LatestStableRelease.Version;
             return this;
         }
     }
@@ -185,7 +187,7 @@ public class DependencyCheck : PackageCheck
     {
         get
         {
-            _packageVersion = new PackageReference(_packageId).LatestReleaseIncludingPreReleases.Version;
+            _versionResolver = () => new PackageReference(_packageId).LatestReleaseIncludingPreReleases.Version;
             return this;
         }
     }
@@ -194,7 +196,7 @@ public class DependencyCheck : PackageCheck
     {
         get
         {
-            _packageVersion = new PackageReference(_packageId).LatestDevBuild.Version;
+            _versionResolver = () => new PackageReference(_packageId).LatestDevBuild.Version;
             return this;
         }
     }
@@ -219,9 +221,13 @@ public class DependencyCheck : PackageCheck
 
     public override bool ApplyTo(DirectoryPath testDirPath)
     {
+        if (_versionResolver != null)
+            _packageVersion = _versionResolver();
+
         var packageInstallPath = testDirPath.GetParent();
         string pattern = packageInstallPath.Combine(_packageId) + ".*";
         List<string> installedPackages = new List<string>();
+
         foreach (var dir in _context.GetDirectories(pattern))
         {
             int index = pattern.Length -2;
