@@ -41,7 +41,10 @@ public class PackageReference
 			if (package.Name == Id)
 				return new PackageReference(package.Name, package.Version);
 
-		return this;
+		// An unresolved latest version must not become an unversioned dependency
+		// check, or silently retain this reference's previously pinned version.
+		throw new InvalidOperationException(
+			$"No matching version of package {Id} was found in sources: {string.Join(", ", sources)} (include prereleases: {includePrerelease}).");
 	}
 
     public bool IsInstalled(string installDirectory)
