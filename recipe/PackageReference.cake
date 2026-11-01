@@ -25,7 +25,7 @@ public class PackageReference
 
 	public PackageReference LatestStableRelease => GetLatestVersion(PRODUCTION_SOURCE, false);
 
-	public PackageReference LatestReleaseIncludingPreReleases => GetLatestVersion(DEVELOPMENT_SOURCE, true);
+	public PackageReference LatestReleaseIncludingPreReleases => GetLatestVersion(PRODUCTION_SOURCE, true);
 
 	public PackageReference LatestDevBuild => GetLatestVersion(DEVELOPMENT_SOURCE, true);
 
