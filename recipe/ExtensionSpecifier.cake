@@ -4,7 +4,7 @@
 // is used unless the user overrides it using SetVersion.
 public class ExtensionSpecifier
 {
-	public ExtensionSpecifier(string nugetId, string chocoId, string version)
+	public ExtensionSpecifier(string nugetId, string chocoId, string version=null)
 	{
 		NuGetId = nugetId;
 		ChocoId = chocoId;
@@ -24,6 +24,15 @@ public class ExtensionSpecifier
 	{
 		return new ExtensionSpecifier(NuGetId, ChocoId, version);
 	}
+
+	public ExtensionSpecifier LatestFullRelease 
+		=> new ExtensionSpecifier(NuGetId, ChocoId, new PackageReference(NuGetId).LatestFullRelease.Version);
+
+	public ExtensionSpecifier LatestPreRelease 
+		=> new ExtensionSpecifier(NuGetId, ChocoId, new PackageReference(NuGetId).LatestPreRelease.Version);
+
+	public ExtensionSpecifier LatestDevBuild 
+		=> new ExtensionSpecifier(NuGetId, ChocoId, new PackageReference(NuGetId).LatestDevBuild.Version);
 
 	// Install this extension for a package
 	public void InstallExtension(PackageDefinition targetPackage)

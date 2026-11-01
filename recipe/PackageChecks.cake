@@ -154,9 +154,8 @@ public class DirectoryCheck : PackageCheck
 
 public class DependencyCheck : PackageCheck
 {
-    private string _packageId;
-    private string _packageVersion;
-
+	private string _packageId;
+	private string _packageVersion;
 
     private List<DirectoryCheck> _directoryChecks = new List<DirectoryCheck>();
     private List<FilePath> _files = new List<FilePath>();
@@ -171,6 +170,33 @@ public class DependencyCheck : PackageCheck
     {
         _packageId = packageReference.Id;
         _packageVersion = packageReference.Version;
+    }
+
+    public DependencyCheck LatestFullRelease
+    {
+        get
+        {
+            _packageVersion = new PackageReference(_packageId).LatestFullRelease.Version;
+            return this;
+        }
+    }
+
+    public DependencyCheck LatestPreRelease
+    {
+        get
+        {
+            _packageVersion = new PackageReference(_packageId).LatestPreRelease.Version;
+            return this;
+        }
+    }
+
+    public DependencyCheck LatestDevBuild
+    {
+        get
+        {
+            _packageVersion = new PackageReference(_packageId).LatestDevBuild.Version;
+            return this;
+        }
     }
 
     public DependencyCheck WithFiles(params FilePath[] files)
