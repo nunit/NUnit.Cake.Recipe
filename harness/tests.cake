@@ -26,6 +26,7 @@ Task("Harness-Smoke").Does(() =>
 {
 	var suite = new RecipeTestSuite(Context);
 	suite.Add("real-cake/package-verification-and-failure", () => RunSmoke());
+	suite.Add("real-cake/release-tool-startup", () => RunReleaseToolSmoke());
 	suite.Run("artifacts/smoke.xml");
 });
 Task("Harness").IsDependentOn("Harness-Tests").IsDependentOn("Harness-Smoke");
@@ -231,4 +232,26 @@ void RunSmoke()
 		if (DirectoryExists(root)) DeleteDirectory(root, new DeleteDirectorySettings { Recursive = true });
 	}
 	HarnessAssert.True(!DirectoryExists(root), "smoke fixture cleanup");
+}
+
+void RunReleaseToolSmoke()
+{
+	var executable = Context.Tools.Resolve(IsRunningOnWindows()
+		? "dotnet-gitreleasemanager.exe" : "dotnet-gitreleasemanager");
+	HarnessAssert.True(executable != null, "Cake-installed GitReleaseManager tool was not found");
+	using (var process = Context.ProcessRunner.Start(executable, new ProcessSettings
+	{
+		Arguments = "showconfig --no-logo",
+		EnvironmentVariables = ReleaseManager.ToolEnvironment,
+		RedirectStandardOutput = true,
+		RedirectStandardError = true
+	}))
+	{
+		process.WaitForExit();
+		string output = string.Join(Environment.NewLine, process.GetStandardOutput());
+		string error = string.Join(Environment.NewLine, process.GetStandardError());
+		HarnessAssert.Equal(0, process.GetExitCode(), "release-tool startup: " + error);
+		HarnessAssert.True(output.Contains("create:") && output.Contains("export:"), "release-tool configuration output");
+		Information("Release-tool startup verified (read-only configuration).");
+	}
 }

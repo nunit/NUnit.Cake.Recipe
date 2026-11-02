@@ -7,6 +7,15 @@ public static class ReleaseManager
 		_context = BuildSettings.Context;
 	}
 
+	/// <summary>
+	/// Allows the pinned GitReleaseManager tool to run when only a newer major
+	/// runtime is installed. Apply only to that tool's child process.
+	/// </summary>
+	internal static IDictionary<string, string> ToolEnvironment => new Dictionary<string, string>
+	{
+		{ "DOTNET_ROLL_FORWARD", "Major" }
+	};
+
 	public static void Publish()
 	{
 		bool hadErrors = false;
@@ -189,7 +198,8 @@ public static class ReleaseManager
 				_context.GitReleaseManagerCreate(BuildSettings.GitHubAccessToken, BuildSettings.GitHubOwner, BuildSettings.GitHubRepository, new GitReleaseManagerCreateSettings()
 				{
 					Name = releaseName,
-					Milestone = releaseVersion
+					Milestone = releaseVersion,
+					EnvironmentVariables = ToolEnvironment
 				});
 			}
 			catch
@@ -231,7 +241,8 @@ public static class ReleaseManager
 				_context.GitReleaseManagerCreate(BuildSettings.GitHubAccessToken, BuildSettings.GitHubOwner, BuildSettings.GitHubRepository, new GitReleaseManagerCreateSettings()
 				{
 					Name = releaseName,
-					Milestone = releaseVersion
+					Milestone = releaseVersion,
+					EnvironmentVariables = ToolEnvironment
 				});
 			}
 			catch
@@ -253,7 +264,7 @@ public static class ReleaseManager
 		string milestone = BuildSettings.BranchName.Substring(8);
 
 		_context.GitReleaseManagerExport(BuildSettings.GitHubAccessToken, BuildSettings.GitHubOwner, BuildSettings.GitHubRepository, "DraftRelease.md",
-			new GitReleaseManagerExportSettings() { TagName = milestone });
+			new GitReleaseManagerExportSettings() { TagName = milestone, EnvironmentVariables = ToolEnvironment });
 	}
 
 	public static void CreateProductionRelease()
@@ -279,8 +290,10 @@ public static class ReleaseManager
 			_context.Information($"Publishing release {tagName} to GitHub");
 			_context.Information($"  Assets: {assets}");
 
-			_context.GitReleaseManagerAddAssets(token, owner, repository, tagName, assets);
-			_context.GitReleaseManagerClose(token, owner, repository, tagName);
+			_context.GitReleaseManagerAddAssets(token, owner, repository, tagName, assets,
+				new GitReleaseManagerAddAssetsSettings() { EnvironmentVariables = ToolEnvironment });
+			_context.GitReleaseManagerClose(token, owner, repository, tagName,
+				new GitReleaseManagerCloseMilestoneSettings() { EnvironmentVariables = ToolEnvironment });
 		}
 	}
 }

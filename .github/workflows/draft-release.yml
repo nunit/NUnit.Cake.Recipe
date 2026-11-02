@@ -15,12 +15,13 @@ jobs:
     - name: 🛠️ Setup .NET
       uses: actions/setup-dotnet@v6
       with:
-        dotnet-version: |
-          8.0.x
-          7.0.x
+        dotnet-version: 10.0.x
 
     - name: 🛠️ Install dotnet tools
       run: dotnet tool restore
+
+    - name: 🧪 Check Release Tool Startup
+      run: dotnet tool run dotnet-gitreleasemanager -- showconfig --no-logo
 
     - name: 🔨 Create Draft Release
       env:

@@ -1,7 +1,7 @@
 # Recipe source harness
 
 This harness loads `../recipe/*.cake` directly. No published recipe package or
-copied implementation is used. It runs under the repository's .NET 8 SDK policy
+copied implementation is used. It runs under the repository's .NET 10 SDK policy
 and pinned Cake.Tool 6.3.0, with Cake.Testing 6.3.0 for its test doubles.
 
 From the repository root:
@@ -28,7 +28,7 @@ recipe's normal setup; no packaging or publishing target runs.
 | Target | Coverage | Report |
 | --- | --- | --- |
 | `Harness-Tests` | Deferred dependency checks, exact package IDs and versions, source/prerelease options, extension selectors, unresolved lookups, tool failures, unversioned checks and package-verification failure propagation | `harness/artifacts/tests.xml` |
-| `Harness-Smoke` | Full source loading, recipe setup, Cake target execution and `PackageDefinition.VerifyPackage()` using actual filesystem/globbing operations, including an expected missing-file failure | `harness/artifacts/smoke.xml` |
+| `Harness-Smoke` | Full source loading, recipe setup, Cake target execution, real filesystem package verification (including expected failure), and read-only startup of the Cake-installed release tool | `harness/artifacts/smoke.xml` |
 
 Reports use JUnit XML. Every behavior case runs before the target fails for any
 assertions. A failed target returns a nonzero exit code. Compilation/setup failures
@@ -46,6 +46,12 @@ tree. During its deliberate missing-file verification, it captures the recipe's
 log and asserts both the exception and the specific error diagnostic. A successful
 run prints `Expected missing-file failure verified (payload.txt).` Unexpected
 exceptions or diagnostics still fail the target and appear in the XML report.
+
+The release-tool smoke case executes only `showconfig --no-logo`; it performs no
+release operation. Both CI workflows also check the local-manifest release tool
+after restore. GitReleaseManager 0.20.0 still targets older runtimes, so its local
+manifest enables roll-forward and recipe calls supply `DOTNET_ROLL_FORWARD=Major`
+only to that tool's child process. No job-wide runtime override is used.
 
 ## Regression history
 
