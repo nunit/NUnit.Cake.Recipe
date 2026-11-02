@@ -68,4 +68,6 @@ On main commit `4554436d`, 40 of the 102 behavior cases pass and 62 expose #130;
 the smoke case passes. Those regression assertions deliberately remain active.
 The separate #130 correction changes the unresolved lookup into a clear exception.
 Keep recipe corrections separate from harness infrastructure when reviewing the
-commits. CI integration belongs to the separate workflow work in #131.
+commits. Following the workflow restoration in #131, CI runs `Harness` before
+packaging or publishing. A failed harness step prevents those later actions, and
+the XML reports are uploaded even when a test fails.
