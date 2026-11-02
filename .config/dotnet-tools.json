@@ -21,7 +21,7 @@
       "commands": [
         "dotnet-gitreleasemanager"
       ],
-      "rollForward": false
+      "rollForward": true
     }
   }
 }
