@@ -203,7 +203,28 @@ void RunSmoke()
 		});
 		package.VerifyPackage();
 		DeleteFile(subject.CombineWithFilePath("payload.txt"));
-		HarnessAssert.Throws<Exception>(() => package.VerifyPackage(), "Verification failed!");
+
+		// Capture only the deliberately failing verification. Keep the real
+		// filesystem and assert its diagnostic instead of printing a false alarm.
+		var expectedLog = new Cake.Testing.FakeLog();
+		var failureContext = new CakeContext(Context.FileSystem, Context.Environment,
+			Context.Globber, expectedLog, Context.Arguments, Context.ProcessRunner,
+			Context.Registry, Context.Tools, new CakeDataService(), Context.Configuration);
+		BuildSettings.Initialize(failureContext, "Recipe Harness", "NUnit.Cake.Recipe", solutionFile: "Harness.sln");
+		try
+		{
+			var missingPayload = new HarnessPackage(subject, new PackageCheck[] { HasFile("payload.txt") });
+			HarnessAssert.Throws<Exception>(() => missingPayload.VerifyPackage(), "Verification failed!");
+			var errors = expectedLog.Entries.Where(entry => entry.Level == Cake.Core.Diagnostics.LogLevel.Error).ToArray();
+			HarnessAssert.Equal(1, errors.Length, "expected missing-file diagnostic count");
+			HarnessAssert.True(errors[0].Message.Contains(
+				"File " + subject.CombineWithFilePath("payload.txt") + " was not found."), "expected missing-file diagnostic");
+		}
+		finally
+		{
+			BuildSettings.Initialize(Context, "Recipe Harness", "NUnit.Cake.Recipe", solutionFile: "Harness.sln");
+		}
+		Information("Expected missing-file failure verified (payload.txt).");
 	}
 	finally
 	{

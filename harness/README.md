@@ -42,8 +42,10 @@ forms on any host. These cases are **not** native Linux or macOS execution.
 
 The smoke target uses a fresh directory under `harness/artifacts` and removes that
 directory in `finally`. It neither executes NuGet nor changes any existing package
-tree. Expected recipe error output during its missing-file assertion is normal;
-the final assertion and XML report determine the test result.
+tree. During its deliberate missing-file verification, it captures the recipe's
+log and asserts both the exception and the specific error diagnostic. A successful
+run prints `Expected missing-file failure verified (payload.txt).` Unexpected
+exceptions or diagnostics still fail the target and appear in the XML report.
 
 ## Regression history
 
