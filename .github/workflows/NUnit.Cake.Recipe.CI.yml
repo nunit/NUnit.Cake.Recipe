@@ -47,9 +47,6 @@ jobs:
     - name: 🧪 Check Release Tool Startup
       run: dotnet tool run dotnet-gitreleasemanager -- showconfig --no-logo
 
-    - name: 🧪 Test Recipe Sources
-      run: dotnet cake harness/tests.cake --target=Harness --packageVersion=1.0.0 --nopush
-
     - name: 🔨 Package and Publish Recipe to MyGet
       run: dotnet cake --target=ContinuousIntegration --configuration=Release #--verbosity=diagnostic
 

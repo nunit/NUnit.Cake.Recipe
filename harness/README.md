@@ -8,6 +8,18 @@ From the repository root:
 
 ```sh
 dotnet tool restore
+dotnet cake --target=Test
+```
+
+The repository's `Test` target runs both harness targets in a separate Cake
+process and fails if that process fails. This isolates the harness's temporary
+recipe settings from the parent build. `BuildTestAndPackage` and
+`ContinuousIntegration` run `Test` before packaging and publishing, retaining the
+recipe's standard dependencies and explicit `--notests` option.
+
+To run the standalone harness or select one of its targets directly:
+
+```sh
 dotnet cake harness/tests.cake --target=Harness --packageVersion=1.0.0 --nopush
 ```
 
@@ -74,6 +86,6 @@ On main commit `4554436d`, 40 of the 102 behavior cases pass and 62 expose #130;
 the smoke case passes. Those regression assertions deliberately remain active.
 The separate #130 correction changes the unresolved lookup into a clear exception.
 Keep recipe corrections separate from harness infrastructure when reviewing the
-commits. Following the workflow restoration in #131, CI runs `Harness` before
-packaging or publishing. A failed harness step prevents those later actions, and
-the XML reports are uploaded even when a test fails.
+commits. CI invokes the harness through the normal `Test` target rather than a
+separate workflow step. A failed harness or smoke test prevents packaging and
+publishing, and the XML reports are uploaded even when a test fails.

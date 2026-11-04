@@ -27,6 +27,25 @@ BuildSettings.Packages.Add(
 	) );
 
 //////////////////////////////////////////////////////////////////////
+// TEST THE RECIPE
+//////////////////////////////////////////////////////////////////////
+
+// Keep the standard dependencies and criteria, but replace compiled-test discovery.
+ClearActions(BuildTasks.UnitTestTask);
+BuildTasks.UnitTestTask.Does(() =>
+{
+	// The harness changes static recipe settings, so run it in a separate process.
+	var exitCode = StartProcess("dotnet", new ProcessSettings
+	{
+		Arguments = "tool run dotnet-cake -- harness/tests.cake --target=Harness --packageVersion=1.0.0 --nopush",
+		WorkingDirectory = BuildSettings.ProjectDirectory
+	});
+
+	if (exitCode != 0)
+		throw new CakeException($"Recipe harness failed with exit code {exitCode}. See harness/artifacts for available reports.");
+});
+
+//////////////////////////////////////////////////////////////////////
 // EXECUTION
 //////////////////////////////////////////////////////////////////////
 
