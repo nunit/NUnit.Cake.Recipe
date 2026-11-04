@@ -49,6 +49,16 @@ Build.Run();                                         // Note 4
 The [source harness](harness/README.md) tests maintained recipe scripts directly,
 with controlled package responses and a real Cake smoke target.
 
+Run both through the standard recipe target:
+
+```sh
+dotnet tool restore
+dotnet cake --target=Test
+```
+
+`BuildTestAndPackage` and `ContinuousIntegration` also run this target before
+packaging. A failed harness or smoke test stops the sequence before publication.
+
 ## Supported Arguments
 
 The recipe supports a number of standard command-line arguments. Additional arguments may be
